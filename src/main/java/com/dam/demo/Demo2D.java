@@ -46,7 +46,7 @@ public class Demo2D extends SimpleApplication {
 
     // turn off stats view (you can leave it on, if you want)
     setDisplayStatView(false);
-    setDisplayFps(false);
+    setDisplayFps(true);
     addInputs();
 
     guiNode.attachChild(SoundUtil.initialize());
