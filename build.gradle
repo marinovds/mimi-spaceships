@@ -1,0 +1,148 @@
+plugins {
+    id 'application'
+    id 'java'
+    id "de.undercouch.download" version "5.1.0"
+    id 'idea'
+    id "io.github.0ffz.github-packages" version "1.2.1"
+    // Plugin for anonymous inclusion of artifacts hosted in github package registry
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+description = 'DealOrNot application'
+
+java {
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+ext {
+    gsonVersion = '2.10.1'
+    jmonkeyVersion = '3.7.0-stable'
+    jacksonVersion = '2.17.2'
+    junitVersion = '5.8.1'
+}
+
+
+mainClassName = 'com.dam.Application'
+if (!hasProperty('mainClass')) {
+    ext.mainClass = mainClassName
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+application {
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+        // this is when using a Mac as a development machine which requires the AppKit main UI thread to be used for GUI applications
+    }
+}
+
+dependencies {
+    implementation group: 'org.jmonkeyengine', name: 'jme3-core', version: "${jmonkeyVersion}"
+    implementation group: 'org.jmonkeyengine', name: 'jme3-desktop', version: "${jmonkeyVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: "${jacksonVersion}"
+
+    runtimeOnly group: 'org.jmonkeyengine', name: 'jme3-jogg', version: "${jmonkeyVersion}"
+    runtimeOnly group: 'org.jmonkeyengine', name: 'jme3-plugins', version: "${jmonkeyVersion}"
+    runtimeOnly group: 'org.jmonkeyengine', name: 'jme3-lwjgl3', version: "${jmonkeyVersion}"
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// cleanup tasks
+clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs')
+task cleanDLLs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.dll')
+}
+task cleanDyLibs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.dylib')
+}
+task cleanLogs(type: Delete) {
+    delete fileTree(dir: '.', include: 'hs_err_pid*.log')
+}
+task cleanSOs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.so')
+}
+
+task fund() {
+    doLast {
+        java.awt.Desktop.desktop.browse "https://start.jmonkeyengine.org/#!funding=JME_DESKTOP".toURI()
+    }
+}
+
+// Distribution tasks
+//See https://api.adoptium.net/v3/assets/feature_releases/11/ga?image_type=jre for jre urls
+def windowsJreUrl = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.6%2B10/OpenJDK17U-jre_x64_windows_hotspot_17.0.6_10.zip"
+
+distZip {
+    //having a degenerate folder within the dist zip complicates generating the other zips
+    eachFile { file ->
+        String path = file.relativePath
+        file.setPath(path.substring(path.indexOf("/") + 1, path.length()))
+    }
+    includeEmptyDirs(false)
+}
+
+
+task downloadWindowsJre(type: Download) {
+    src windowsJreUrl
+    dest new File(buildDir, '/jres/windowsJre.zip')
+    overwrite false
+}
+
+task downloadAndUnzipWindowsJre(dependsOn: downloadWindowsJre, type: Copy) {
+    from zipTree(downloadWindowsJre.dest)
+    into "${buildDir}/jres/windowsJre/"
+    includeEmptyDirs(false)
+    filesMatching("**") {
+        it.path = it.path.replaceAll("^[a-zA-Z0-9.+-]*[/\\\\]", "jre/")
+        //rename the top level to something standard so the rest of the script will be easier
+    }
+}
+
+task buildWindowsDistribution(dependsOn: [distZip, downloadAndUnzipWindowsJre], type: Copy)
+{
+    group 'distribution'
+    from files("${projectDir}/scripts/desktopDeployment/DealOrNot.bat"), zipTree(distZip.archiveFile), "${buildDir}/jres/windowsJre"
+    into new File(buildDir, 'distributions/DealOrNot-windows')
+    includeEmptyDirs false
+    exclude 'bin/**' //we are adding our own run scripts, exclude the ones coming from distZip
+}
+
+task zipWindowsDistribution(dependsOn: buildWindowsDistribution, type: Zip) {
+    group 'distribution'
+    archiveFileName = "DealOrNot-windows.zip"
+    destinationDirectory = file("$buildDir/distributions")
+    from "$buildDir/distributions/DealOrNot-windows"
+}
+
+
+task buildAllDistributions {
+    group 'distribution'
+    dependsOn 'zipWindowsDistribution'
+
+
+    doLast {
+        println("Distributions created in build/distributions folder")
+    }
+}

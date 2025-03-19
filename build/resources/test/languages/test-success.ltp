@@ -1,0 +1,8 @@
+-- Comment
+
+key=This is a value -- with comment in it
+key2= This is a
+      multiline value
+
+-- Having =
+key3= The \= is escaped

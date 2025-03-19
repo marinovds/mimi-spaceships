@@ -1,0 +1,103 @@
+game.intro=Здравейте! Вие сте с новия епизод на Сделка или Не. Днес при нас е този скъп гост.
+ Можете ли да ни кажете вашето име?
+game.intro=Здравейте отново скъпи приятели! Вие гледате Сделка или Не, а аз съм вашият водещ.
+ Можете ли да ни кажете името Ви?
+
+player.box=Радвам се да го чуя. При нас си с кутия номер ${player.box}. Успех!
+player.city=От къде идваш?
+
+box.chosen=Избра кутия номер ${box.number}. Да видим какво има вътре...
+            ${box.amount}
+box.chosen=Кутия номер ${box.number}... Чудя се какво ли има там...
+            ${box.amount}
+box.chosen=Интересен избор. Да видим
+            ${box.amount}
+box.chosen=Надявам се ${box.number} да ти доведе късмет
+            ${box.amount}
+box.chosen=И аз щях да избера кутия ${box.number}
+            ${box.amount}
+box.chosen=Да видим какво има вътре!
+            ${box.amount}
+
+box.left=Трябва да отвориш още ${box.left}
+box.left=${box.left} още в този рунд
+box.left=Трябва да избереш още ${box.left} преди да получиш офертата на банкера
+
+available.amounts=Текущо наличните суми са ::
+${available}
+available.amounts=Сумите останали в играта са ::
+${available}
+
+available.numbers=Текущо наличните кутии са ::
+${available}
+available.numbers=Може да избереш от кутии ::
+${available}
+
+available.error=Няма такава кутия в играта...
+
+-- Offer
+offer.amount=Офертата на банката е ${banker.offer}
+offer.amount=Банката предложи ${banker.offer}
+offer.amount=Говорих с банкера. Той предложи ${banker.offer}
+
+offer.boxes.next=Следващият рунд ще трябва да отвориш ${box.next}
+
+offer.accepted.amount=Вече прие оферта за ${player.accepted}
+offer.accepted.amount=Ти взе ${player.accepted}
+
+offer.accepted.re=Щеше ли да я приемеш тази, ако имаше възможността?
+offer.accepted.re=Щеше ли да вземеш под внимание тази оферта?
+offer.accepted.re=Какво щеше да мислиш за тази оферта?
+
+offer.accepted.re.taken=${player.name} щеше да приеме офертата от ${offer.amount}
+offer.accepted.re.taken=Сделката щеше да бъде приета!
+offer.accepted.re.taken=${offer.amount} щяха да са достатъчни за ${player.name} и щеше да приеме сделката
+
+offer.accepted.re.rejected=${player.name} щеше да отхвърли офертата от ${offer.amount}
+offer.accepted.re.rejected=Банкерът не може да те подкупи отново
+
+offer.swap=Офертата на банката е смяна на кутиите
+offer.swap=Би ли сменил кутията си? Това предлага банкерът
+offer.swap.outcome=Избра да смениш твоята кутия номер ${player.box} с номер ${player.box.new}
+
+offer.deal.taken=Имаме сделка!
+offer.deal=1 - Сделка или 2 - Не?
+offer.deal.error=Моля, избери 1 или 2
+
+-- Support --
+support.high=Имам предчувствие, че тук има много пари...
+support.high=Тази кутия е гореща. Има много пари вътре
+support.high=Имам странното чувтво, че тук има много пари
+
+support.low=Много ми е лекичка
+support.low=Не мисля, че тука има пари
+support.low=Тук смятам, че ще има ниска сума
+
+support.neutral=Нямам никакво усещане за тази кутия
+support.neutral=Искам да ти помогна, но нямам никаква представа какво има тук
+support.neutral=Радвам се, че не съм на твоето място...
+
+support.exact=Мисля, че има ${box.amount} в тази кутия
+support.exact=Имам чувството, че има ${box.amount} в кутията
+support.exact=Има ${box.amount} вътре
+
+support.other=1 - Избери тази или 2 - Избери друга
+
+-- Outro --
+game.exit=Добре ${player.name}. Времето най-сетне дойда да разберем защо дойде в нашето шоу...
+game.exit=Стигнахме до този момент в играта. Ще разберем какво е в кутията на ${player.name}...
+
+game.exit.otherBox=Да видим какво има в кутия номер ${box.number}
+game.exit.otherBox=Да проверим другата кутия, преди да отворим твоята
+game.exit.otherBox=Кутия номер ${box.number}... Нашият голям враг..
+
+game.exit.otherBox.amount=Това е ${box.amount}
+game.exit.otherBox.amount=Вътре има ${box.amount}
+game.exit.otherBox.amount=Сумата от ${box.amount} се крие там
+
+game.exit.amount=Отиваш си вкущи с невероятната сума от ${game.amount}
+
+game.exit.city=Поздравления! Това е историята, която ще споделиш в ${player.city}
+game.exit.city=Хората от ${player.city} определено са се вълнували докато гледат тази изключителна игра
+
+game.exit.finale=До следващият епизод на 'Сделка или не'

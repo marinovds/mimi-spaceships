@@ -1,0 +1,27 @@
+
+o
+java:S1104"RMake PLAYER a static final constant or non-public and provide accessors if needed.(şË˜ã8Æ®’ÀÓ2
+l
+java:S1104 "PMake BOSS a static final constant or non-public and provide accessors if needed.(ÇŞ¼%8Æ®’ÀÓ2
+q
+java:S1104""OMake HUD a static final constant or non-public and provide accessors if needed.(„Ç÷¬øÿÿÿÿ8Æ®’ÀÓ2
+o
+java:S1104#"RMake active a static final constant or non-public and provide accessors if needed.(ôœ¤º8Æ®’ÀÓ2
+I
+java:S1444",Make this "public static PLAYER" field final(şË˜ã8Æ®’ÀÓ2
+F
+java:S1444 "*Make this "public static BOSS" field final(ÇŞ¼%8Æ®’ÀÓ2
+K
+java:S1444"")Make this "public static HUD" field final(„Ç÷¬øÿÿÿÿ8Æ®’ÀÓ2
+I
+java:S1444#",Make this "public static active" field final(ôœ¤º8Æ®’ÀÓ2
+n
+java:S3008"QRename this field "PLAYER" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(şË˜ã8Ö®’ÀÓ2
+k
+java:S3008 "ORename this field "BOSS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÇŞ¼%8Ö®’ÀÓ2
+p
+java:S3008""NRename this field "HUD" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(„Ç÷¬øÿÿÿÿ8Ö®’ÀÓ2
+\
+java:S1854S":Remove this useless assignment to local variable "unused".(ÇôÛÉÿÿÿÿÿ8á®’ÀÓ2
+M
+java:S1481S"+Remove this unused "unused" local variable.(ÇôÛÉÿÿÿÿÿ8á®’ÀÓ2
