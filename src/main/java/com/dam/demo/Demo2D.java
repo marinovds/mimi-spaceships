@@ -46,7 +46,7 @@ public class Demo2D extends SimpleApplication {
 
     // turn off stats view (you can leave it on, if you want)
     setDisplayStatView(false);
-    setDisplayFps(true);
+    setDisplayFps(false);
     addInputs();
 
     guiNode.attachChild(SoundUtil.initialize());
@@ -56,7 +56,7 @@ public class Demo2D extends SimpleApplication {
 
   @Override
   public void simpleUpdate(float tpf) {
-    Level.tick();
+    Level.tick(tpf);
   }
 
   private void addInputs() {

@@ -1,12 +1,12 @@
 package com.dam.demo.controls.behaviour.attack;
 
 import static com.dam.demo.controls.behaviour.ControlsUtil.attacks;
-import static com.dam.demo.util.MathUtil.inCooldown;
 
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Attack;
 import com.dam.demo.model.attack.Attack.Rotary;
-import java.time.Instant;
+import com.dam.demo.util.MathUtil;
+import java.time.Duration;
 import java.util.List;
 
 public class RotaryBehaviour implements AttackBehaviour {
@@ -16,14 +16,14 @@ public class RotaryBehaviour implements AttackBehaviour {
   private final List<AttackBehaviour> behaviours;
   private RotaryStatus status;
   private int attackIndex;
-  private Instant timestamp;
+  private Duration duration;
 
   public RotaryBehaviour(Spaceship spaceship, Rotary rotary) {
     this.attack = rotary;
     this.behaviours = attacks(rotary.attacks(), spaceship);
 
     this.status = RotaryStatus.ATTACKING;
-    this.timestamp = Instant.now();
+    this.duration = rotary.attackDuration();
     this.attackIndex = 0;
   }
 
@@ -31,7 +31,7 @@ public class RotaryBehaviour implements AttackBehaviour {
   public void onTick(float tpf) {
     switch (status) {
       case ATTACKING -> attack(tpf);
-      case COOLDOWN -> cooldown();
+      case COOLDOWN -> cooldown(tpf);
     }
   }
 
@@ -44,18 +44,20 @@ public class RotaryBehaviour implements AttackBehaviour {
     return behaviours;
   }
 
-  private void cooldown() {
-    if (!inCooldown(timestamp, attack.cooldown())) {
+  private void cooldown(float tpf) {
+    if (duration.isZero()) {
       status = RotaryStatus.ATTACKING;
-      timestamp = Instant.now();
+      duration = attack.attackDuration();
     }
+    duration = MathUtil.subtractDuration(duration, tpf);
   }
 
   private void attack(float tpf) {
     behaviours.get(attackIndex).onTick(tpf);
-    if (!inCooldown(timestamp, attack.attackDuration())) {
+    duration = MathUtil.subtractDuration(duration, tpf);
+    if (duration.isZero()) {
       status = RotaryStatus.COOLDOWN;
-      timestamp = Instant.now();
+      duration = attack.cooldown();
       attackIndex = nextIndex(behaviours.size(), attackIndex);
     }
   }

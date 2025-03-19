@@ -3,7 +3,6 @@ package com.dam.demo.enemies;
 import static com.dam.demo.game.Scene.ENEMIES;
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
-import static com.dam.demo.util.MathUtil.inCooldown;
 import static com.dam.util.RandomUtil.RANDOM;
 
 import com.dam.demo.controls.behaviour.ControlsUtil;
@@ -16,9 +15,9 @@ import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.LangUtil;
+import com.dam.demo.util.MathUtil;
 import com.jme3.math.Vector3f;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,36 +50,51 @@ public enum EnemySpawner {
       ChaserMovement::new
   );
 
-  public static Optional<Spaceship> createEnemy(EnemyDef definition) {
+  public static Optional<Spaceship> createEnemy(EnemyDef definition, float tpf) {
     var enemyDef = UpgradeUtil.upgrade(definition.spaceship());
     var criteria = definition.spawn();
-    var enemies = getEnemiesOfType(enemyDef.name());
-    if (shouldNotSpawn(enemyDef.name(), criteria, enemies)) {
+    var enemy = enemyDef.name();
+    var enemies = getEnemiesOfType(enemy);
+    if (shouldNotSpawn(enemy, criteria, enemies)) {
+      var cooldown = MathUtil.subtractDuration(getEnemyCooldown(enemy), tpf);
+      setEnemyCooldown(enemy, cooldown);
 
       return Optional.empty();
     }
-    ENEMIES.setUserData(enemyDef.name(), Instant.now().toString());
-    var enemy = AssetUtil.spaceship(enemyDef);
-    var spatial = enemy.spatial();
-    spatial.setName(enemyDef.name() + "_" + UUID.randomUUID());
-    spatial.setLocalTranslation(getSpawnPosition(enemy.dimensions()));
-    var movement = definition.movement().apply(enemy);
-    spatial.addControl(ControlsUtil.spaceshipControl(enemy, movement));
 
-    return Optional.of(enemy);
+    setEnemyCooldown(enemy, definition.spawn().cooldown());
+    var spaceship = AssetUtil.spaceship(enemyDef);
+    var spatial = spaceship.spatial();
+    spatial.setName(enemy + "_" + UUID.randomUUID());
+    spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
+    var movement = definition.movement().apply(spaceship);
+    spatial.addControl(ControlsUtil.spaceshipControl(spaceship, movement));
+
+    return Optional.of(spaceship);
   }
 
-  private static boolean shouldNotSpawn(String enemy, SpawnCriteria criteria, List<Spaceship> enemies) {
+  private static boolean shouldNotSpawn(
+      String enemy,
+      SpawnCriteria criteria,
+      List<Spaceship> enemies) {
     if (criteria == SpawnCriteria.NONE) {
       return false;
     }
+
     return enemies.size() >= criteria.maxNumber()
-        || inCooldown(lastSpawned(enemy), criteria.cooldown())
+        || getEnemyCooldown(enemy).isPositive()
         || RANDOM.nextInt(criteria.random()) != 0;
   }
 
-  private static Instant lastSpawned(String name) {
-    return LangUtil.mapNull(ENEMIES.getUserData(name), Instant::parse);
+  private static Duration getEnemyCooldown(String name) {
+    var result = LangUtil.mapNull(ENEMIES.getUserData(name), Duration::parse);
+    return result == null
+        ? Duration.ZERO
+        : result;
+  }
+
+  private static void setEnemyCooldown(String name, Duration duration) {
+    ENEMIES.setUserData(name, duration.toString());
   }
 
   private static List<Spaceship> getEnemiesOfType(String type) {

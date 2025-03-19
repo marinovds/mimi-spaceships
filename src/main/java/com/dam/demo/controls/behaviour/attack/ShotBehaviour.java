@@ -17,7 +17,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import java.time.Instant;
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -28,20 +28,22 @@ public class ShotBehaviour implements AttackBehaviour {
   private final Vector3f aim;
 
   private Attack.Shot attack;
-  private Instant lastShot;
+  private Duration cooldown;
 
   public ShotBehaviour(Spaceship spaceship, Attack.Shot shot) {
     this.spaceship = spaceship;
     this.attack = shot;
     this.aim = getAim(spaceship);
+    this.cooldown = Duration.ZERO;
   }
 
   @Override
   public void onTick(float tpf) {
-    if (MathUtil.inCooldown(lastShot, attack.cooldown())) {
+    if (cooldown.isPositive()) {
+      cooldown = MathUtil.subtractDuration(cooldown, tpf);
       return;
     }
-    lastShot = Instant.now();
+    cooldown = attack.cooldown();
     var shot = shoot(spaceship, aim, attack);
     var node = spaceship.is(ShipType.PLAYER) ? PLAYER_BULLETS : ENEMY_BULLETS;
     node.attachChild(shot);

@@ -11,27 +11,24 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 public class ParticleControl extends AbstractControl {
 
-  private final Duration lifespan;
-  private final Instant spawned;
+  private Duration span;
+  private final Duration duration;
   private final ColorRGBA color;
   private Vector3f velocity;
 
   public ParticleControl(Vector3f velocity, ColorRGBA color) {
     this.velocity = velocity;
-    this.lifespan = Duration.ofMillis(1_500);
-    this.spawned = Instant.now();
+    this.span = Duration.ofMillis(1_500);
+    this.duration = span;
     this.color = color;
   }
 
   @Override
 
   protected void controlUpdate(float tpf) {
-
     // movement
     spatial.move(velocity.mult(tpf * 3f));
     velocity.multLocal(1 - 3f * tpf);
@@ -53,17 +50,17 @@ public class ParticleControl extends AbstractControl {
     spatial.scale(0.65f);
 
     // is particle expired?
-    if (!MathUtil.inCooldown(spawned, lifespan)) {
+    span = MathUtil.subtractDuration(span, tpf);
+    if (span.isZero())  {
       spatial.removeFromParent();
     }
   }
 
   private float calculateAlpha(float speed) {
-    long difTime = ChronoUnit.MILLIS.between(spawned, Instant.now());
+    long difTime = duration.minus(span).toMillis();
 
-    float percentLife = 1 - (float) difTime / lifespan.toMillis();
-    float alpha = min(1.5f, min(percentLife * 2, speed));
-    return alpha * alpha;
+    float percentLife = 1 - (float) difTime / span.toMillis();
+    return min(1.5f, min(percentLife * 2, speed));
   }
 
   @Override
