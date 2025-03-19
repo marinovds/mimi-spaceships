@@ -16,9 +16,9 @@ class LanguageLoaderTest {
     assertAll(
         () -> assertEquals("test-success", actual.locale()),
         () -> assertEquals(UTF_8, actual.charset()),
-        () -> assertEquals("This is a builder", translations.get("key")),
-        () -> assertEquals("This is a\n      multiline builder", translations.get("key2")),
-        () -> assertEquals("The = is escaped", translations.get("key3"))
+        () -> assertEquals("This is a value", translations.get("key").get(0)),
+        () -> assertEquals("This is a\n      multiline value", translations.get("key2").get(0)),
+        () -> assertEquals("The = is escaped", translations.get("key3").get(0))
     );
   }
 
