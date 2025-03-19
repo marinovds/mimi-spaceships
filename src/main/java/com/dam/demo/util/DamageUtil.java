@@ -2,7 +2,6 @@ package com.dam.demo.util;
 
 import static com.dam.demo.model.UserConstants.HEALTH;
 import static com.dam.demo.model.UserConstants.LAST_HIT;
-import static com.dam.demo.util.MathUtil.inCooldown;
 import static com.dam.demo.util.MathUtil.isDead;
 import static java.lang.Math.max;
 
@@ -14,7 +13,6 @@ import com.dam.demo.game.ParticleManager;
 import com.dam.demo.game.Scene;
 import com.dam.demo.game.SoundUtil;
 import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.attack.Damage;
 import com.jme3.scene.Spatial;
 import java.time.Instant;
@@ -78,9 +76,7 @@ public enum DamageUtil {
   }
 
   private static boolean hitPlayer(Spaceship player, Damage damage) {
-    if (inCooldown(getLastHit(player), UserConstants.INVINCIBILITY)) {
-      return false;
-    }
+    // TODO: Add player invincibility when hit
     var health = calculateHealth(player, damage);
     player.spatial().setUserData(HEALTH, health);
     player.spatial().setUserData(LAST_HIT, Instant.now().toString());

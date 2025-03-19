@@ -9,7 +9,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.time.Duration;
-import java.time.Instant;
 
 public enum MathUtil {
   ;
@@ -39,13 +38,14 @@ public enum MathUtil {
         && abs(a.getLocalTranslation().y - b.getLocalTranslation().y) < heightDiff;
   }
 
-  public static boolean inCooldown(Instant last, Duration cooldown) {
-    if (last == null) {
-      // no previous value. Not in cooldown
-      return false;
+  public static Duration subtractDuration(Duration current, float tpf) {
+    if (current == null) {
+      return Duration.ZERO;
     }
 
-    return Instant.now().isBefore(last.plus(cooldown));
+    var nanos = (int) (tpf * 1_000_000_000f);
+    var result = current.minusNanos(nanos);
+    return result.isNegative() ? Duration.ZERO : result;
   }
 
   public static Vector3f getAimDirection(Vector3f location) {

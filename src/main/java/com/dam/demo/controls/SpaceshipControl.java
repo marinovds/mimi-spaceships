@@ -15,7 +15,7 @@ import com.dam.demo.util.MathUtil;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
-import java.time.Instant;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,7 +24,7 @@ public final class SpaceshipControl extends AbstractControl {
 
 
   private final MovementBehaviour movement;
-  private final Map<Buff, Instant> buffs;
+  private final Map<Buff, Duration> buffs;
 
   private AttackBehaviour attack;
 
@@ -38,7 +38,7 @@ public final class SpaceshipControl extends AbstractControl {
 
   @Override
   protected void controlUpdate(float tpf) {
-    expireBuffs();
+    expireBuffs(tpf);
     var movementIncrease = movementIncrease();
     movement.onTick(apply(tpf, movementIncrease));
     var boundary = checkBoundaries(spatial.getLocalTranslation(), Dimensions.of(spatial));
@@ -56,10 +56,11 @@ public final class SpaceshipControl extends AbstractControl {
         .orElse(0);
   }
 
-  private void expireBuffs() {
+  private void expireBuffs(float tpf) {
+    buffs.replaceAll((b, d) -> MathUtil.subtractDuration(d, tpf));
     var expired = buffs.entrySet()
         .stream()
-        .filter(x -> !MathUtil.inCooldown(x.getValue(), x.getKey().duration()))
+        .filter(x -> x.getValue().isZero())
         .map(Entry::getKey)
         .toList();
 
@@ -80,7 +81,7 @@ public final class SpaceshipControl extends AbstractControl {
   }
 
   public void addBuff(Buff buff) {
-    var prev = buffs.put(buff, Instant.now());
+    var prev = buffs.put(buff, buff.duration());
     applyBuff(buff, prev == null);
   }
 

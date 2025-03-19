@@ -25,10 +25,10 @@ public enum Level {
     return level;
   }
 
-  public static void tick() {
+  public static void tick(float tpf) {
     HUD.update();
     var unused = switch (state) {
-      case ENEMY_SPAWNING -> spawnEnemies();
+      case ENEMY_SPAWNING -> spawnEnemies(tpf);
       case BOSS_SPAWNING -> spawnBoss();
       case BOSS_FIGHTING, PAUSED, DEFEAT, VICTORY -> null; // Don't do anything
     };
@@ -40,7 +40,8 @@ public enum Level {
       return null;
     }
     SoundUtil.music("boss1");
-    Scene.addEnemy(createEnemy(BOSS_1).get());
+    // Bosses are never in cooldown
+    Scene.addEnemy(createEnemy(BOSS_1, 0).get());
     state = LevelState.BOSS_FIGHTING;
     return null;
   }
@@ -60,15 +61,15 @@ public enum Level {
     return result;
   }
 
-  private static Void spawnEnemies() {
+  private static Void spawnEnemies(float tpf) {
     if (PLAYER.points() + enemyPoints() >= getLevelScore(level)) {
       state = LevelState.BOSS_SPAWNING;
       return null;
     }
     Stream.of(
-            createEnemy(CRUISER_DEF),
-            createEnemy(BOMBER_DEF),
-            level > 1 ? createEnemy(CHASER_DEF) : Optional.<Spaceship>empty()
+            createEnemy(CRUISER_DEF, tpf),
+            createEnemy(BOMBER_DEF, tpf),
+            level > 1 ? createEnemy(CHASER_DEF, tpf) : Optional.<Spaceship>empty()
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
