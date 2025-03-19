@@ -50,13 +50,13 @@ public enum BonusUtil {
       return;
     }
     var buff = weighted(
-        option(1, bonus("coin", location, s -> s.addCoins(15))),
-        option(1, bonus("heart", location, s -> s.addHealth(20))),
-        option(1, bonus("star", location, s -> s.addPoints(300))),
-        option(1, bonus("damage", location, s -> s.addBuff(DAMAGE_BUFF))),
-        option(1, bonus("speed", location, s -> s.addBuff(SPEED_BUFF))),
-        option(1, bonus("attack", location, s -> s.addBuff(ATTACK_BUFF))),
-        option(1, bonus("shot", location, s -> s.addBuff(SHOT_BUFF)))
+        option(1, bonus("buffCoin", location, s -> s.addCoins(15))),
+        option(1, bonus("buffHeart", location, s -> s.addHealth(20))),
+        option(1, bonus("buffStar", location, s -> s.addPoints(300))),
+        option(1, bonus("buffDamage", location, s -> s.addBuff(DAMAGE_BUFF))),
+        option(1, bonus("buffSpeed", location, s -> s.addBuff(SPEED_BUFF))),
+        option(1, bonus("buffAttack", location, s -> s.addBuff(ATTACK_BUFF))),
+        option(1, bonus("buffShot", location, s -> s.addBuff(SHOT_BUFF)))
     );
 
     BUFFS.attachChild(buff);
