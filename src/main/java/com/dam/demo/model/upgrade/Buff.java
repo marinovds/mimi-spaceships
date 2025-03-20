@@ -5,13 +5,4 @@ import java.time.Duration;
 
 public record Buff(Upgrade upgrade, Duration duration, ColorRGBA color) {
 
-  public Buff invert() {
-
-    return new Buff(
-        new Upgrade(-upgrade.percentage(), upgrade.type()),
-        duration,
-        color.mult(-1f)
-    );
-  }
-
 }

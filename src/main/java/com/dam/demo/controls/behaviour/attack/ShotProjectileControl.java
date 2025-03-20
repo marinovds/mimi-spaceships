@@ -3,7 +3,7 @@ package com.dam.demo.controls.behaviour.attack;
 import static com.dam.demo.util.AssetUtil.checkBoundaries;
 
 import com.dam.demo.model.Dimensions;
-import com.dam.demo.model.attack.Attack.Shot;
+import com.dam.demo.model.attack.Shot;
 import com.dam.demo.util.DamageUtil;
 import com.dam.demo.util.MathUtil;
 import com.jme3.math.Vector3f;

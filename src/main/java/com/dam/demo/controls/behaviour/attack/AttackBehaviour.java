@@ -1,11 +1,19 @@
 package com.dam.demo.controls.behaviour.attack;
 
-import com.dam.demo.model.attack.Attack;
-
 public interface AttackBehaviour {
 
-    void onTick(float tpf);
+  /**
+   * Attacks with the underlying implementation of the attack behaviour. Doesn't do anything in case
+   * the attack is in cooldown.
+   *
+   * @param tpf the time per frame in seconds
+   */
+  void tryAttack(float tpf);
 
-    Attack getAttack();
-
+  /**
+   * Tick the duration of the attack behaviour despite not attacking.
+   *
+   * @param tpf the time per frame in seconds
+   */
+  void tick(float tpf);
 }

@@ -1,23 +1,30 @@
-package com.dam.demo.controls.behaviour.movement;
+package com.dam.demo.controls.behaviour.spaceship;
 
 import static com.dam.demo.game.Scene.PLAYER;
 import static com.dam.demo.util.MathUtil.angleFromVector;
 
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.ParticleManager;
-import com.dam.demo.game.Scene;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.attack.Damage;
+import com.dam.demo.model.attack.SpaceshipAttack;
+import com.dam.demo.util.DamageUtil;
+import com.dam.demo.util.JsonUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
-public class ChaserMovement extends MovementBase {
+public class ChaserBehaviour extends SpaceshipBehaviourBase {
+
+  private final Damage collision;
 
   private int speed;
   private float rotation;
 
-  public ChaserMovement(Spaceship spaceship) {
+  public ChaserBehaviour(Spaceship spaceship) {
     super(spaceship);
+    var attack = JsonUtil.read(spaceship.attack(), ChaserAttack.class);
+    this.collision = Damage.collision(attack.collision());
   }
 
   @Override
@@ -41,15 +48,23 @@ public class ChaserMovement extends MovementBase {
   @Override
   public void onBoundary(Boundary boundary) {
     if (boundary.left()) {
-      Scene.kill(spaceship);
+      spaceship.spatial().removeFromParent();
     }
   }
 
   @Override
   public void onCollision(Spatial spatial) {
     if (ShipType.PLAYER.is(spatial)) {
+      DamageUtil.hit(spatial, buffDamage(collision));
       spaceship.spatial().removeFromParent();
       ParticleManager.explosion(spaceship.location(), 10);
     }
   }
+
+  @Override
+  public void attack(float tpf) {
+    // The Chaser collides - no attack
+  }
+
+  public record ChaserAttack(int collision) implements SpaceshipAttack{};
 }

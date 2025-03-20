@@ -1,18 +1,21 @@
 package com.dam.demo.model.attack;
 
-import com.dam.demo.model.DamageType;
+public record Damage(int amount, DamageType type) {
 
-public record Damage(int damage, DamageType type) {
-
-  public static Damage bullet(int damage) {
-    return new Damage(damage, DamageType.BULLET);
+  public static Damage bullet(int amount) {
+    return new Damage(amount, DamageType.BULLET);
   }
 
-  public static Damage rocket(int damage) {
-    return new Damage(damage, DamageType.ROCKET);
+  public static Damage rocket(int amount) {
+    return new Damage(amount, DamageType.ROCKET);
   }
 
-  public static Damage collision(int damage) {
-    return new Damage(damage, DamageType.COLLISION);
+  public static Damage collision(int amount) {
+    return new Damage(amount, DamageType.COLLISION);
+  }
+
+  public enum DamageType {
+
+      BULLET, ROCKET, COLLISION
   }
 }

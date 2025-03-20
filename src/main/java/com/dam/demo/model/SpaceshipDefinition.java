@@ -10,9 +10,10 @@ import static com.dam.demo.model.UserConstants.TAGS;
 import static com.dam.demo.model.UserConstants.UPGRADE;
 
 import com.dam.demo.enemies.Tag;
-import com.dam.demo.model.attack.Attack;
+import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.model.upgrade.UpgradeUtil;
+import com.dam.demo.util.JsonUtil;
 import com.jme3.scene.Spatial;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 public record SpaceshipDefinition(
     String name,
     Set<Tag> tags,
-    Attack attack,
+    SpaceshipAttack attack,
     List<Upgrade> upgrades,
     int speed,
     int health,
@@ -30,7 +31,7 @@ public record SpaceshipDefinition(
 
   public SpaceshipDefinition(String name,
       Set<Tag> tags,
-      Attack attack,
+      SpaceshipAttack attack,
       int speed,
       int health,
       int coins,
@@ -62,7 +63,7 @@ public record SpaceshipDefinition(
   public void applyTo(Spatial spatial) {
     spatial.setUserData(HEALTH, health);
     spatial.setUserData(SPEED, speed);
-    spatial.setUserData(ATTACK, Attack.toString(attack));
+    spatial.setUserData(ATTACK, JsonUtil.write(attack));
     spatial.setUserData(UPGRADE, UpgradeUtil.toString(upgrades));
     spatial.setUserData(COINS, coins);
     spatial.setUserData(POINTS, points);

@@ -2,14 +2,15 @@ package com.dam.demo.controls;
 
 import static com.dam.demo.util.AssetUtil.checkBoundaries;
 import static com.dam.demo.util.MathUtil.apply;
+import static com.dam.demo.util.MathUtil.collided;
 
-import com.dam.demo.controls.behaviour.attack.AttackBehaviour;
-import com.dam.demo.controls.behaviour.movement.MovementBehaviour;
+import com.dam.demo.controls.behaviour.spaceship.SpaceshipBehaviour;
+import com.dam.demo.game.Scene;
 import com.dam.demo.model.Dimensions;
+import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.model.upgrade.UpgradeType;
-import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.MathUtil;
 import com.jme3.renderer.RenderManager;
@@ -19,20 +20,20 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 public final class SpaceshipControl extends AbstractControl {
 
+  private final Spaceship spaceship;
+  private final SpaceshipBehaviour behaviour;
 
-  private final MovementBehaviour movement;
   private final Map<Buff, Duration> buffs;
 
-  private AttackBehaviour attack;
-
   public SpaceshipControl(
-      AttackBehaviour attack,
-      MovementBehaviour movement) {
-    this.attack = attack;
-    this.movement = movement;
+      Spaceship spaceship,
+      SpaceshipBehaviour behaviour) {
+    this.spaceship = spaceship;
+    this.behaviour = behaviour;
     buffs = new HashMap<>();
   }
 
@@ -40,10 +41,24 @@ public final class SpaceshipControl extends AbstractControl {
   protected void controlUpdate(float tpf) {
     expireBuffs(tpf);
     var movementIncrease = movementIncrease();
-    movement.onTick(apply(tpf, movementIncrease));
+    behaviour.move(apply(tpf, movementIncrease));
     var boundary = checkBoundaries(spatial.getLocalTranslation(), Dimensions.of(spatial));
-    movement.onBoundary(boundary);
-    attack.onTick(tpf);
+    behaviour.onBoundary(boundary);
+    Stream.concat(
+            Scene.ENEMIES.getChildren().stream(),
+            Stream.of(Scene.PLAYER.spatial())
+        )
+        .filter(x -> spatial != x) // Ignore yourself
+        .filter(x -> collided(spatial, x))
+        .forEach(behaviour::onCollision);
+
+    var activeBuffs = buffs.keySet()
+        .stream()
+        .map(Buff::upgrade)
+        .toList();
+
+    behaviour.currentlyActiveBuffs(activeBuffs);
+    behaviour.attack(tpf);
   }
 
   private int movementIncrease() {
@@ -66,7 +81,8 @@ public final class SpaceshipControl extends AbstractControl {
 
     for (var buff : expired) {
       buffs.remove(buff);
-      applyBuff(buff.invert(), true);
+      var color = AssetUtil.getColor(spatial);
+      AssetUtil.setColor(spatial, color.add(buff.color().mult(-1f)));
     }
   }
 
@@ -76,20 +92,12 @@ public final class SpaceshipControl extends AbstractControl {
     // Not used for 2D graphics
   }
 
-  public MovementBehaviour movement() {
-    return movement;
-  }
-
   public void addBuff(Buff buff) {
     var prev = buffs.put(buff, buff.duration());
-    applyBuff(buff, prev == null);
+    if (prev == null) {
+      var color = AssetUtil.getColor(spatial);
+      AssetUtil.setColor(spatial, color.add(buff.color()));
+    }
   }
 
-  private void applyBuff(Buff buff, boolean applyColor) {
-    if (applyColor) {
-      var color = AssetUtil.getColor(spatial);
-      AssetUtil.setColor(spatial, color.add(buff.color().mult(6f)));
-    }
-    attack = UpgradeUtil.buffAttack(attack, buff);
-  }
 }

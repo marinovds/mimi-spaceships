@@ -34,5 +34,4 @@ public enum JsonUtil {
       throw new RuntimeException("Cannot read value", e);
     }
   }
-
 }

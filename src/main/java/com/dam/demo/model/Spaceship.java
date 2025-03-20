@@ -8,7 +8,6 @@ import static com.dam.demo.model.UserConstants.TAGS;
 
 import com.dam.demo.controls.SpaceshipControl;
 import com.dam.demo.enemies.Tag;
-import com.dam.demo.model.attack.Attack;
 import com.dam.demo.model.upgrade.Buff;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
@@ -18,14 +17,14 @@ public record Spaceship(
     Spatial spatial,
     Dimensions dimensions,
     Set<Tag> tags,
-    Attack attack) {
+    String attack) {
 
   public static Spaceship of(Spatial spatial) {
     return new Spaceship(
         spatial,
         Dimensions.of(spatial),
         Tag.parse(spatial.getUserData(TAGS)),
-        Attack.parse(spatial.getUserData(ATTACK))
+        spatial.getUserData(ATTACK)
     );
   }
 

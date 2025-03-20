@@ -99,6 +99,6 @@ public enum DamageUtil {
 
   private static int calculateHealth(Spaceship target, Damage attack) {
 
-    return max(0, target.health() - attack.damage());
+    return max(0, target.health() - attack.amount());
   }
 }

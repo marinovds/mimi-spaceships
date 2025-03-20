@@ -5,14 +5,14 @@ import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.util.RandomUtil.RANDOM;
 
-import com.dam.demo.controls.behaviour.ControlsUtil;
-import com.dam.demo.controls.behaviour.movement.BomberMovement;
-import com.dam.demo.controls.behaviour.movement.ChaserMovement;
-import com.dam.demo.controls.behaviour.movement.CruiserMovement;
+import com.dam.demo.controls.SpaceshipControl;
+import com.dam.demo.controls.behaviour.spaceship.BomberBehaviour;
+import com.dam.demo.controls.behaviour.spaceship.Boss1Behaviour;
+import com.dam.demo.controls.behaviour.spaceship.ChaserBehaviour;
+import com.dam.demo.controls.behaviour.spaceship.CruiserBehaviour;
 import com.dam.demo.game.SpaceshipDefinitions;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.LangUtil;
 import com.dam.demo.util.MathUtil;
@@ -28,30 +28,30 @@ public enum EnemySpawner {
   public static final EnemyDef BOSS_1 = new EnemyDef(
       SpaceshipDefinitions.BOSS_1_DEF,
       SpawnCriteria.NONE,
-      CruiserMovement::new
+      Boss1Behaviour::new
   );
 
   public static final EnemyDef CRUISER_DEF = new EnemyDef(
       SpaceshipDefinitions.CRUISER_DEF,
       new SpawnCriteria(Duration.ofSeconds(1), 150, 5),
-      CruiserMovement::new
+      CruiserBehaviour::new
   );
 
 
   public static final EnemyDef BOMBER_DEF = new EnemyDef(
       SpaceshipDefinitions.BOMBER_DEF,
       new SpawnCriteria(Duration.ofSeconds(3), 300, 3),
-      BomberMovement::new
+      BomberBehaviour::new
   );
 
   public static final EnemyDef CHASER_DEF = new EnemyDef(
       SpaceshipDefinitions.CHASER_DEF,
       new SpawnCriteria(Duration.ofSeconds(1), 300, 1),
-      ChaserMovement::new
+      ChaserBehaviour::new
   );
 
   public static Optional<Spaceship> createEnemy(EnemyDef definition, float tpf) {
-    var enemyDef = UpgradeUtil.upgrade(definition.spaceship());
+    var enemyDef = definition.spaceship();
     var criteria = definition.spawn();
     var enemy = enemyDef.name();
     var enemies = getEnemiesOfType(enemy);
@@ -67,8 +67,7 @@ public enum EnemySpawner {
     var spatial = spaceship.spatial();
     spatial.setName(enemy + "_" + UUID.randomUUID());
     spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
-    var movement = definition.movement().apply(spaceship);
-    spatial.addControl(ControlsUtil.spaceshipControl(spaceship, movement));
+    spatial.addControl(new SpaceshipControl(spaceship, definition.behaviour().apply(spaceship)));
 
     return Optional.of(spaceship);
   }

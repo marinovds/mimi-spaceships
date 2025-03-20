@@ -1,15 +1,14 @@
 package com.dam.demo.controls.behaviour.attack;
 
-import static com.dam.demo.controls.behaviour.ControlsUtil.getAim;
 import static com.dam.demo.game.Scene.ENEMY_BULLETS;
 import static com.dam.demo.game.Scene.PLAYER_BULLETS;
+import static com.dam.demo.util.MathUtil.getAimDirection;
 
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.Scene;
 import com.dam.demo.game.SoundUtil;
 import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.attack.Attack;
-import com.dam.demo.model.attack.Attack.Shot;
+import com.dam.demo.model.attack.Shot;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.MathUtil;
 import com.jme3.math.ColorRGBA;
@@ -27,29 +26,34 @@ public class ShotBehaviour implements AttackBehaviour {
   private final Spaceship spaceship;
   private final Vector3f aim;
 
-  private Attack.Shot attack;
+  private Shot shot;
   private Duration cooldown;
 
-  public ShotBehaviour(Spaceship spaceship, Attack.Shot shot) {
+  public ShotBehaviour(Spaceship spaceship, Shot shot) {
     this.spaceship = spaceship;
-    this.attack = shot;
+    this.shot = shot;
     this.aim = getAim(spaceship);
     this.cooldown = Duration.ZERO;
   }
 
   @Override
-  public void onTick(float tpf) {
+  public void tryAttack(float tpf) {
     if (cooldown.isPositive()) {
-      cooldown = MathUtil.subtractDuration(cooldown, tpf);
+      tick(tpf);
       return;
     }
-    cooldown = attack.cooldown();
-    var shot = shoot(spaceship, aim, attack);
+    cooldown = shot.cooldown();
+    var shot = shoot(spaceship, aim, this.shot);
     var node = spaceship.is(ShipType.PLAYER) ? PLAYER_BULLETS : ENEMY_BULLETS;
     node.attachChild(shot);
   }
 
-  private static Spatial shoot(Spaceship spaceship, Vector3f aim, Attack.Shot shot) {
+  @Override
+  public void tick(float tpf) {
+    cooldown = MathUtil.subtractDuration(cooldown, tpf);
+  }
+
+  private static Spatial shoot(Spaceship spaceship, Vector3f aim, Shot shot) {
     var spatial = switch (shot.damage().type()) {
       case BULLET -> bullet(spaceship);
       case ROCKET -> rocket();
@@ -115,14 +119,15 @@ public class ShotBehaviour implements AttackBehaviour {
         .filter(x -> x.getName().equals("rocket"));
   }
 
-  @Override
-  public Shot getAttack() {
-    return attack;
+  private static Vector3f getAim(Spaceship spaceship) {
+    if (spaceship.is(ShipType.ENEMY) || spaceship.is(ShipType.BOSS)) {
+      return getAimDirection(spaceship.location()).negate();
+    }
+    return getAimDirection(spaceship.location());
   }
 
-  public ShotBehaviour updateAttack(Shot attack) {
-    this.attack = attack;
-
+  public ShotBehaviour setShot(Shot shot) {
+    this.shot = shot;
     return this;
   }
 }

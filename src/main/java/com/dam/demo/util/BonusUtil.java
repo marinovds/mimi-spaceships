@@ -24,7 +24,7 @@ public enum BonusUtil {
   private static final Buff DAMAGE_BUFF = new Buff(
       new Upgrade(100, UpgradeType.ATTACK_DAMAGE),
       Duration.ofSeconds(10),
-      ColorRGBA.Red
+      new ColorRGBA(10, 0, 0, 1)
   );
 
   private static final Buff SPEED_BUFF = new Buff(

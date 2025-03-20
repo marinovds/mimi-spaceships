@@ -7,10 +7,8 @@ import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.demo.util.AssetUtil.spaceship;
 
 import com.dam.demo.controls.SpaceshipControl;
-import com.dam.demo.controls.behaviour.attack.PlayerAttack;
-import com.dam.demo.controls.behaviour.movement.PlayerMovement;
+import com.dam.demo.controls.behaviour.spaceship.PlayerBehaviour;
 import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.attack.Attack.Parallel;
 import com.dam.demo.util.AssetUtil;
 import com.jme3.font.BitmapText;
 import com.jme3.math.Vector3f;
@@ -59,10 +57,7 @@ public enum Scene {
     var dimensions = result.dimensions();
     var spatial = result.spatial();
     spatial.setLocalTranslation(dimensions.radius(), screenHeight() / 2f, 0);
-    spatial.addControl(new SpaceshipControl(
-        new PlayerAttack(result, (Parallel) result.attack()),
-        new PlayerMovement(result))
-    );
+    spatial.addControl(new SpaceshipControl(result, new PlayerBehaviour(result)));
 
     return result;
   }

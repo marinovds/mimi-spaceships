@@ -1,34 +1,34 @@
 package com.dam.demo.controls.behaviour.attack;
 
-import static com.dam.demo.controls.behaviour.ControlsUtil.attacks;
-
-import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.attack.Attack;
-import com.dam.demo.model.attack.Attack.Rotary;
 import com.dam.demo.util.MathUtil;
 import java.time.Duration;
 import java.util.List;
 
 public class RotaryBehaviour implements AttackBehaviour {
 
-  private final Rotary attack;
+  private final Duration attackDuration;
+  private final Duration cooldownDuration;
 
-  private final List<AttackBehaviour> behaviours;
+
+  private List<ShotBehaviour> attacks;
   private RotaryStatus status;
   private int attackIndex;
   private Duration duration;
 
-  public RotaryBehaviour(Spaceship spaceship, Rotary rotary) {
-    this.attack = rotary;
-    this.behaviours = attacks(rotary.attacks(), spaceship);
+  public RotaryBehaviour(
+      Duration attackDuration,
+      Duration cooldownDuration) {
+    this.attacks = List.of();
+    this.attackDuration = attackDuration;
+    this.cooldownDuration = cooldownDuration;
 
     this.status = RotaryStatus.ATTACKING;
-    this.duration = rotary.attackDuration();
+    this.duration = attackDuration;
     this.attackIndex = 0;
   }
 
   @Override
-  public void onTick(float tpf) {
+  public void tryAttack(float tpf) {
     switch (status) {
       case ATTACKING -> attack(tpf);
       case COOLDOWN -> cooldown(tpf);
@@ -36,29 +36,31 @@ public class RotaryBehaviour implements AttackBehaviour {
   }
 
   @Override
-  public Attack getAttack() {
-    return attack;
+  public void tick(float tpf) {
+    duration = MathUtil.subtractDuration(duration, tpf);
   }
 
-  public List<AttackBehaviour> getBehaviours() {
-    return behaviours;
+  public RotaryBehaviour setAttacks(List<ShotBehaviour> attacks) {
+    this.attacks = attacks;
+
+    return this;
   }
 
   private void cooldown(float tpf) {
     if (duration.isZero()) {
       status = RotaryStatus.ATTACKING;
-      duration = attack.attackDuration();
+      duration = attackDuration;
     }
-    duration = MathUtil.subtractDuration(duration, tpf);
+    tick(tpf);
   }
 
   private void attack(float tpf) {
-    behaviours.get(attackIndex).onTick(tpf);
-    duration = MathUtil.subtractDuration(duration, tpf);
+    attacks.get(attackIndex).tryAttack(tpf);
+    tick(tpf);
     if (duration.isZero()) {
       status = RotaryStatus.COOLDOWN;
-      duration = attack.cooldown();
-      attackIndex = nextIndex(behaviours.size(), attackIndex);
+      duration = cooldownDuration;
+      attackIndex = nextIndex(attacks.size(), attackIndex);
     }
   }
 
