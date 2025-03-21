@@ -1,14 +1,15 @@
 package com.dam.demo.model.behaviour.spaceship;
 
-import static com.dam.demo.game.Scene.PLAYER;
 import static com.dam.demo.util.MathUtil.angleFromVector;
 
+import com.dam.demo.controls.ParticleManager;
 import com.dam.demo.enemies.Tag.ShipType;
-import com.dam.demo.game.ParticleManager;
+import com.dam.demo.game.context.Contexts;
+import com.dam.demo.game.context.LevelContext;
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.LangUtil;
 import com.jme3.math.Vector3f;
@@ -41,7 +42,7 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void move(float tpf) {
-    var aim = getAim(PLAYER.location(), spaceship.location());
+    var aim = getAim(Contexts.contextByClass(LevelContext.class).player.location(), spaceship.location());
     float actualRotation = angleFromVector(aim.negate());
     if (actualRotation != rotation) {
       spaceship.spatial().rotate(0, 0, actualRotation - rotation);

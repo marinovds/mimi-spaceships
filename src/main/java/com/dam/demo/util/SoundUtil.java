@@ -1,6 +1,5 @@
-package com.dam.demo.game;
+package com.dam.demo.util;
 
-import com.dam.demo.util.AssetUtil;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioSource.Status;

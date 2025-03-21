@@ -1,22 +1,30 @@
 package com.dam.demo.model.behaviour.spaceship;
 
-import static com.dam.demo.controls.Input.DOWN;
-import static com.dam.demo.controls.Input.SHOOT;
-import static com.dam.demo.controls.Input.UP;
+import static com.dam.demo.listeners.KeyboardListener.Input.DOWN;
+import static com.dam.demo.listeners.KeyboardListener.Input.SHOOT;
+import static com.dam.demo.listeners.KeyboardListener.Input.UP;
 
-import com.dam.demo.listeners.KeyboardListener;
+import com.dam.demo.listeners.KeyboardListener.Action;
+import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.ShotBehaviour;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.JsonUtil;
 import com.jme3.scene.Spatial;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class PlayerBehaviour extends SpaceshipBehaviourBase {
 
   private final ShotBehaviour behaviour;
+  private final Map<Input, Boolean> inputs = new EnumMap<>(Map.of(
+      UP, false,
+      DOWN, false,
+      SHOOT, false
+  ));
 
   private boolean topReached;
   private boolean bottomReached;
@@ -31,23 +39,16 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void move(float tpf) {
-    if (KeyboardListener.INPUTS.get(UP)) {
-      up(tpf);
-    }
-    if (KeyboardListener.INPUTS.get(DOWN)) {
-      down(tpf);
-    }
-  }
-
-  private void down(float tpf) {
-    if (bottomReached) {
+    if (inputs.get(UP) == inputs.get(DOWN)) {
+      // Either both pressed, or none. Don't move either way.
       return;
     }
-    spaceship.spatial().move(0, -tpf * spaceship.speed(), 0);
+
+    tryMove(inputs.get(UP) ? tpf : -tpf);
   }
 
-  private void up(float tpf) {
-    if (topReached) {
+  private void tryMove(float tpf) {
+    if (tpf > 0 ? topReached : bottomReached) {
       return;
     }
     spaceship.spatial().move(0, tpf * spaceship.speed(), 0);
@@ -66,12 +67,18 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void attack(float tpf) {
-    Consumer<ShotBehaviour> f = KeyboardListener.INPUTS.get(SHOOT)
+    Consumer<ShotBehaviour> f = inputs.get(SHOOT)
         ? x -> x.tryAttack(buffs, tpf)
         : x -> x.tick(tpf);
 
     f.accept(behaviour);
   }
 
-  public record PlayerAttack(Shot shot) implements SpaceshipAttack{}
+  public void onInput(Input input, Action action) {
+    inputs.put(input, action.isPressed());
+  }
+
+  public record PlayerAttack(Shot shot) implements SpaceshipAttack {
+
+  }
 }

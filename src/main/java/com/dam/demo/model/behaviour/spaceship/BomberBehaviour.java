@@ -5,7 +5,7 @@ import static java.lang.Math.signum;
 
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
 import com.dam.demo.util.JsonUtil;

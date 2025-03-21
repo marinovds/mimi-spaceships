@@ -1,6 +1,6 @@
 package com.dam.demo.model.behaviour.spaceship;
 
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.upgrade.Upgrade;
 import java.util.List;
 

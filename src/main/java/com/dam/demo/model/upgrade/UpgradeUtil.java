@@ -1,6 +1,5 @@
 package com.dam.demo.model.upgrade;
 
-import static com.dam.demo.game.Scene.BUFFS;
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.decreaseDuration;
 import static com.dam.demo.util.MathUtil.getAimDirection;
@@ -9,12 +8,15 @@ import static com.dam.util.RandomUtil.RANDOM;
 import static com.dam.util.RandomUtil.weighted;
 
 import com.dam.demo.controls.BonusControl;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.game.context.Contexts;
+import com.dam.demo.game.context.LevelContext;
 import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.attack.Shot;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.MathUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
@@ -31,6 +33,13 @@ public enum UpgradeUtil {
   public static final ColorRGBA COLOR_ATTACK_SPEED = ColorRGBA.Green;
   public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.LightGray;
 
+  public static String toString(List<Upgrade> upgrades) {
+    return JsonUtil.write(upgrades);
+  }
+
+  public static List<Upgrade> parse(String value) {
+    return JsonUtil.read(value, new TypeReference<>() {});
+  }
   public static void spawnBonus(Vector3f location) {
     if (RANDOM.nextInt(4) != 0) {
       return;
@@ -46,7 +55,7 @@ public enum UpgradeUtil {
         option(1, bonus("buffShot", location, buff(new Upgrade(100, UpgradeType.SHOT_SPEED))))
     );
 
-    BUFFS.attachChild(buff);
+    Contexts.contextByClass(LevelContext.class).buffs.attachChild(buff);
   }
 
   private static Supplier<Spatial> bonus(String name, Vector3f location, Consumer<Spaceship> f) {
@@ -89,10 +98,6 @@ public enum UpgradeUtil {
         .map(x -> MathUtil.apply(damage.amount(), x.percentage()))
         .map(x -> new Damage(x, damage.type()))
         .orElse(damage);
-  }
-
-  public static String toString(List<Upgrade> upgrades) {
-    return JsonUtil.write(upgrades);
   }
 
   public static Shot upgradeShot(Shot shot, Upgrade upgrade) {

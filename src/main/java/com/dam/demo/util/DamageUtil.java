@@ -8,11 +8,10 @@ import static java.lang.Math.max;
 import com.dam.demo.enemies.Tag.ArmorType;
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.enemies.Tag.SpatialType;
-import com.dam.demo.game.Level;
-import com.dam.demo.game.ParticleManager;
-import com.dam.demo.game.Scene;
-import com.dam.demo.game.SoundUtil;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.controls.ParticleManager;
+import com.dam.demo.game.context.Contexts;
+import com.dam.demo.game.context.LevelContext;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.jme3.scene.Spatial;
@@ -45,11 +44,11 @@ public enum DamageUtil {
     boss.spatial().setUserData(HEALTH, health);
     if (isDead(boss)) {
       SoundUtil.play("explode");
-      Scene.PLAYER.addCoins(boss.coins())
+      Contexts.contextByClass(LevelContext.class).player.addCoins(boss.coins())
           .addPoints(boss.points());
       ParticleManager.explosion(boss.location(), 200);
-      Level.bossKilled();
-      Scene.kill(boss);
+      Contexts.contextByClass(LevelContext.class).bossKilled();
+      boss.spatial().removeFromParent();
       return true;
     }
 
@@ -63,9 +62,9 @@ public enum DamageUtil {
     spaceship.spatial().setUserData(HEALTH, health);
     if (isDead(spaceship)) {
       SoundUtil.play("explode");
-      Scene.PLAYER.addCoins(spaceship.coins())
+      Contexts.contextByClass(LevelContext.class).player.addCoins(spaceship.coins())
           .addPoints(spaceship.points());
-      Scene.kill(spaceship);
+      spaceship.spatial().removeFromParent();
       ParticleManager.explosion(spaceship.location(), 20);
       UpgradeUtil.spawnBonus(spaceship.location());
       return true;
@@ -83,8 +82,7 @@ public enum DamageUtil {
     player.spatial().setUserData(LAST_HIT, Instant.now().toString());
     if (isDead(player)) {
       ParticleManager.explosion(player.location(), 300);
-      Level.playerKilled();
-      Scene.kill(player);
+      Contexts.contextByClass(LevelContext.class).playerKilled();
       return true;
     }
 

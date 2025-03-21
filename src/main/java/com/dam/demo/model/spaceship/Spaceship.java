@@ -1,16 +1,23 @@
-package com.dam.demo.model;
+package com.dam.demo.model.spaceship;
 
 import static com.dam.demo.model.UserConstants.ATTACK;
 import static com.dam.demo.model.UserConstants.COINS;
 import static com.dam.demo.model.UserConstants.HEALTH;
 import static com.dam.demo.model.UserConstants.POINTS;
 import static com.dam.demo.model.UserConstants.TAGS;
+import static com.dam.demo.model.UserConstants.UPGRADE;
 
 import com.dam.demo.controls.SpaceshipControl;
 import com.dam.demo.enemies.Tag;
+import com.dam.demo.model.Dimensions;
+import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.upgrade.Buff;
+import com.dam.demo.model.upgrade.Upgrade;
+import com.dam.demo.model.upgrade.UpgradeUtil;
+import com.dam.demo.util.LangUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
+import java.util.List;
 import java.util.Set;
 
 public record Spaceship(
@@ -48,6 +55,10 @@ public record Spaceship(
     return spatial.getWorldTranslation();
   }
 
+  public List<Upgrade> upgrades() {
+    return UpgradeUtil.parse(spatial.getUserData(UPGRADE));
+  }
+
   public Spaceship addCoins(int amount) {
     var coins = coins() + amount;
     spatial.setUserData(COINS, coins);
@@ -63,7 +74,7 @@ public record Spaceship(
   }
 
   public Spaceship addPoints(int amount) {
-    var points =  points() + amount;
+    var points = points() + amount;
     spatial.setUserData(POINTS, points);
 
     return this;
@@ -81,5 +92,10 @@ public record Spaceship(
 
   public SpaceshipControl control() {
     return spatial.getControl(SpaceshipControl.class);
+  }
+
+  public void addUpgrade(Upgrade upgrade) {
+    var updated = UpgradeUtil.toString(LangUtil.addToList(upgrades(), upgrade));
+    spatial.setUserData(UPGRADE, updated);
   }
 }

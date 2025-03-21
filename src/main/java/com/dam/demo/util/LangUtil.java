@@ -2,6 +2,7 @@ package com.dam.demo.util;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public enum LangUtil {
   ;
@@ -12,6 +13,11 @@ public enum LangUtil {
 
   public static <V, T> T mapNull(V value, Function<V, T> f) {
     return value == null ? null : f.apply(value);
+  }
+
+  public static <T> List<T> addToList(List<T> list, T entry) {
+    return Stream.concat(list.stream(), Stream.of(entry))
+        .toList();
   }
 
   public static int clamp(int base, int min, int max) {

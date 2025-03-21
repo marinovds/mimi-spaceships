@@ -1,4 +1,4 @@
-package com.dam.demo.game;
+package com.dam.demo.model.spaceship;
 
 import static com.dam.demo.enemies.Tag.ArmorType.HEAVY;
 import static com.dam.demo.enemies.Tag.ArmorType.LIGHT;
@@ -16,7 +16,6 @@ import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour.PlayerAttack;
 import com.dam.demo.enemies.Tag.ArmorType;
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.enemies.Tag.SpatialType;
-import com.dam.demo.model.SpaceshipDefinition;
 import com.dam.demo.model.attack.Shot;
 import java.time.Duration;
 import java.util.List;
