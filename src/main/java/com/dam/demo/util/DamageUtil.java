@@ -14,6 +14,7 @@ import com.dam.demo.game.Scene;
 import com.dam.demo.game.SoundUtil;
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Damage;
+import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.jme3.scene.Spatial;
 import java.time.Instant;
 
@@ -66,7 +67,7 @@ public enum DamageUtil {
           .addPoints(spaceship.points());
       Scene.kill(spaceship);
       ParticleManager.explosion(spaceship.location(), 20);
-      BonusUtil.spawnBonus(spaceship.location());
+      UpgradeUtil.spawnBonus(spaceship.location());
       return true;
     }
     var audio = spaceship.is(ArmorType.HEAVY) ? "heavyHit" : "lightHit";

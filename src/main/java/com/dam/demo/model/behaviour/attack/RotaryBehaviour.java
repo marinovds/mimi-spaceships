@@ -17,9 +17,10 @@ public class RotaryBehaviour implements AttackBehaviour {
   private Duration duration;
 
   public RotaryBehaviour(
+      List<ShotBehaviour> attacks,
       Duration attackDuration,
       Duration cooldownDuration) {
-    this.attacks = List.of();
+    this.attacks = attacks;
     this.attackDuration = attackDuration;
     this.cooldownDuration = cooldownDuration;
 

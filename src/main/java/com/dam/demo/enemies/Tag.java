@@ -47,7 +47,7 @@ public sealed interface Tag {
     }
 
     enum SpatialType implements Tag {
-        SPACESHIP, PROJECTILE, BUFF
+        SPACESHIP, PROJECTILE, BONUS
     }
 
     enum ArmorType implements Tag {

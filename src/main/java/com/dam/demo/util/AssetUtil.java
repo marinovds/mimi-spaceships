@@ -1,6 +1,6 @@
 package com.dam.demo.util;
 
-import static com.dam.demo.enemies.Tag.SpatialType.BUFF;
+import static com.dam.demo.enemies.Tag.SpatialType.BONUS;
 import static com.dam.demo.enemies.Tag.SpatialType.PROJECTILE;
 import static com.dam.demo.model.UserConstants.TAGS;
 
@@ -48,9 +48,9 @@ public enum AssetUtil {
     return result;
   }
 
-  public static Spatial buff(String name) {
+  public static Spatial bonus(String name) {
     var result = images(List.of("buffBase", name));
-    result.setUserData(TAGS, new Object[]{BUFF.name()});
+    result.setUserData(TAGS, new Object[]{BONUS.name()});
     return result;
   }
 
