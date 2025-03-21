@@ -29,7 +29,7 @@ public enum UpgradeUtil {
   public static final ColorRGBA COLOR_SPEED = ColorRGBA.Blue;
   public static final ColorRGBA COLOR_ATTACK_DAMAGE = new ColorRGBA(10, 0, 0, 1);
   public static final ColorRGBA COLOR_ATTACK_SPEED = ColorRGBA.Green;
-  public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.Yellow;
+  public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.LightGray;
 
   public static void spawnBonus(Vector3f location) {
     if (RANDOM.nextInt(4) != 0) {
@@ -77,7 +77,7 @@ public enum UpgradeUtil {
     }
     var result = shot;
     for (var upgrade : upgrades) {
-      result = upgradeShot(shot, upgrade);
+      result = upgradeShot(result, upgrade);
     }
     return result;
   }

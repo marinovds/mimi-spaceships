@@ -7,16 +7,22 @@ import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.ParticleManager;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.attack.SpaceshipAttack;
-import com.dam.demo.util.DamageUtil;
+import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
 import com.dam.demo.util.JsonUtil;
+import com.dam.demo.util.LangUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
+import java.time.Duration;
+import java.util.logging.Logger;
 
 public class ChaserBehaviour extends SpaceshipBehaviourBase {
 
-  private final Damage collision;
+  private static final Logger log = Logger.getLogger("test");
+
+  private final int baseSpeed;
+  private final float speedMult;
+  private final CollisionBehaviour collision;
 
   private int speed;
   private float rotation;
@@ -24,7 +30,13 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
   public ChaserBehaviour(Spaceship spaceship) {
     super(spaceship);
     var attack = JsonUtil.read(spaceship.attack(), ChaserAttack.class);
-    this.collision = Damage.collision(attack.collision());
+    this.baseSpeed = spaceship.speed();
+    this.speedMult = attack.speedMultiplier();
+    this.collision = new CollisionBehaviour(
+        attack.collision(),
+        Duration.ZERO,
+        Duration.ofMillis(100)
+    );
   }
 
   @Override
@@ -35,7 +47,7 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
       spaceship.spatial().rotate(0, 0, actualRotation - rotation);
       rotation = actualRotation;
     }
-    speed += 650 * tpf;
+    speed = calculateNewSpeed(1);
     spaceship.spatial().move(aim.mult(tpf * speed));
   }
 
@@ -53,18 +65,31 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
   }
 
   @Override
-  public void onCollision(Spatial spatial) {
+  public void onCollision(Spatial spatial, float tpf) {
     if (ShipType.PLAYER.is(spatial)) {
-      DamageUtil.hit(spatial, buffDamage(collision));
+      collision.tryAttack(spatial, buffs, tpf);
       spaceship.spatial().removeFromParent();
       ParticleManager.explosion(spaceship.location(), 10);
+      return;
     }
+    if (collision.ignoreFriendlyCollision()) {
+      return;
+    }
+    // Collided with an ally
+    speed = calculateNewSpeed(-2);
+  }
+
+  private int calculateNewSpeed(int mult) {
+    var result = (int) (speed * speedMult * mult);
+    return LangUtil.clamp(result, baseSpeed / 2, 2 * baseSpeed);
   }
 
   @Override
   public void attack(float tpf) {
-    // The Chaser collides - no attack
+    collision.tick(tpf);
   }
 
-  public record ChaserAttack(int collision) implements SpaceshipAttack{};
+  public record ChaserAttack(int collision, float speedMultiplier) implements SpaceshipAttack {
+
+  }
 }

@@ -13,4 +13,8 @@ public enum LangUtil {
   public static <V, T> T mapNull(V value, Function<V, T> f) {
     return value == null ? null : f.apply(value);
   }
+
+  public static int clamp(int base, int min, int max) {
+    return Math.min(Math.max(min, base), max);
+  }
 }

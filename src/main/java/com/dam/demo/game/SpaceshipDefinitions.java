@@ -80,7 +80,7 @@ public enum SpaceshipDefinitions {
   public static final SpaceshipDefinition CHASER_DEF = new SpaceshipDefinition(
       "chaser",
       Set.of(CHASER, ENEMY, LIGHT),
-      new ChaserAttack(30),
+      new ChaserAttack(30, 1.02f),
       500,
       10,
       15,

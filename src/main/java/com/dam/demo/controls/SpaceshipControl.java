@@ -4,10 +4,9 @@ import static com.dam.demo.util.AssetUtil.checkBoundaries;
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.collided;
 
-import com.dam.demo.model.behaviour.spaceship.SpaceshipBehaviour;
 import com.dam.demo.game.Scene;
 import com.dam.demo.model.Dimensions;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.behaviour.spaceship.SpaceshipBehaviour;
 import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.model.upgrade.UpgradeType;
@@ -18,72 +17,81 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 public final class SpaceshipControl extends AbstractControl {
 
-  private final Spaceship spaceship;
+
   private final SpaceshipBehaviour behaviour;
 
   private final Map<Buff, Duration> buffs;
 
   public SpaceshipControl(
-      Spaceship spaceship,
       SpaceshipBehaviour behaviour) {
-    this.spaceship = spaceship;
     this.behaviour = behaviour;
     buffs = new HashMap<>();
   }
 
   @Override
   protected void controlUpdate(float tpf) {
-    expireBuffs(tpf);
-    var movementIncrease = movementIncrease();
+    var activeBuffs = getActiveUpgrades(tpf);
+    var movementIncrease = movementIncrease(activeBuffs);
     behaviour.move(apply(tpf, movementIncrease));
     var boundary = checkBoundaries(spatial.getLocalTranslation(), Dimensions.of(spatial));
     behaviour.onBoundary(boundary);
-    Stream.concat(
+    var collisions = Stream.concat(
             Scene.ENEMIES.getChildren().stream(),
             Stream.of(Scene.PLAYER.spatial())
         )
         .filter(x -> spatial != x) // Ignore yourself
         .filter(x -> collided(spatial, x))
-        .forEach(behaviour::onCollision);
-
-    var activeBuffs = buffs.keySet()
-        .stream()
-        .map(Buff::upgrade)
         .toList();
+    for (var collision : collisions) {
+      behaviour.onCollision(collision, tpf);
+    }
 
     behaviour.currentlyActiveBuffs(activeBuffs);
     behaviour.attack(tpf);
   }
 
-  private int movementIncrease() {
+  /**
+   * Expires the non-active buffs and returns the active upgrades.
+   *
+   * @param tpf the time per frame in seconds
+   * @return the list of currently active upgrades.
+   */
+  private List<Upgrade> getActiveUpgrades(float tpf) {
+    var expired = getExpiredBuffs(tpf);
+    for (var buff : expired) {
+      buffs.remove(buff);
+      var color = AssetUtil.getColor(spatial);
+      AssetUtil.setColor(spatial, color.add(buff.color().mult(-1f)));
+    }
+
     return buffs.keySet()
         .stream()
         .map(Buff::upgrade)
+        .toList();
+  }
+
+  private static int movementIncrease(List<Upgrade> activeBuffs) {
+    return activeBuffs.stream()
         .filter(x -> x.type() == UpgradeType.MOVEMENT_SPEED)
         .mapToInt(Upgrade::percentage)
         .findFirst()
         .orElse(0);
   }
 
-  private void expireBuffs(float tpf) {
+  private List<Buff> getExpiredBuffs(float tpf) {
     buffs.replaceAll((b, d) -> MathUtil.subtractDuration(d, tpf));
-    var expired = buffs.entrySet()
+    return buffs.entrySet()
         .stream()
         .filter(x -> x.getValue().isZero())
         .map(Entry::getKey)
         .toList();
-
-    for (var buff : expired) {
-      buffs.remove(buff);
-      var color = AssetUtil.getColor(spatial);
-      AssetUtil.setColor(spatial, color.add(buff.color().mult(-1f)));
-    }
   }
 
 

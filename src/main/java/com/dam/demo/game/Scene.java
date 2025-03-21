@@ -57,7 +57,7 @@ public enum Scene {
     var dimensions = result.dimensions();
     var spatial = result.spatial();
     spatial.setLocalTranslation(dimensions.radius(), screenHeight() / 2f, 0);
-    spatial.addControl(new SpaceshipControl(result, new PlayerBehaviour(result)));
+    spatial.addControl(new SpaceshipControl(new PlayerBehaviour(result)));
 
     return result;
   }

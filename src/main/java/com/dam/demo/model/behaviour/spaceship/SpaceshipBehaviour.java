@@ -30,8 +30,9 @@ public interface SpaceshipBehaviour {
    * The spaceship collided while moving.
    *
    * @param spatial the object that the spaceship collided with.
+   * @param tpf the time per frame in seconds
    */
-  void onCollision(Spatial spatial);
+  void onCollision(Spatial spatial, float tpf);
 
   /**
    * The attack of the spaceship.

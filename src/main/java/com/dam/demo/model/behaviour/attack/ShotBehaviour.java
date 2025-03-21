@@ -28,7 +28,7 @@ public class ShotBehaviour implements AttackBehaviour {
   private final Spaceship spaceship;
   private final Vector3f aim;
 
-  private Shot shot;
+  private final Shot shot;
   private Duration cooldown;
 
   public ShotBehaviour(Spaceship spaceship, Shot shot) {
@@ -39,15 +39,17 @@ public class ShotBehaviour implements AttackBehaviour {
   }
 
   @Override
-  public void tryAttack(List<Upgrade> buffs, float tpf) {
+  public boolean tryAttack(List<Upgrade> buffs, float tpf) {
     if (cooldown.isPositive()) {
       tick(tpf);
-      return;
+      return false;
     }
+    var shot = upgradeShot(this.shot, buffs);
     cooldown = shot.cooldown();
-    var shot = shoot(spaceship, aim, upgradeShot(this.shot, buffs));
+    var proj = shoot(spaceship, aim, shot);
     var node = spaceship.is(ShipType.PLAYER) ? PLAYER_BULLETS : ENEMY_BULLETS;
-    node.attachChild(shot);
+    node.attachChild(proj);
+    return true;
   }
 
   @Override

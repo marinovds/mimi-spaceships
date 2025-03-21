@@ -43,7 +43,7 @@ public class CruiserBehaviour extends SpaceshipBehaviourBase {
   }
 
   @Override
-  public void onCollision(Spatial spatial) {
+  public void onCollision(Spatial spatial, float tpf) {
     // Cruisers don't collide - maybe...
   }
 
@@ -51,7 +51,9 @@ public class CruiserBehaviour extends SpaceshipBehaviourBase {
   public void attack(float tpf) {
     if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
       behaviour.tryAttack(buffs, tpf);
+      return;
     }
+    behaviour.tick(tpf);
   }
 
   public record CruiserAttack(Shot shot, int random) implements SpaceshipAttack{}

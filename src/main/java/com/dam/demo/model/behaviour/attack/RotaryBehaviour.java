@@ -30,11 +30,11 @@ public class RotaryBehaviour implements AttackBehaviour {
   }
 
   @Override
-  public void tryAttack(List<Upgrade> buffs, float tpf) {
-    switch (status) {
+  public boolean tryAttack(List<Upgrade> buffs, float tpf) {
+    return switch (status) {
       case ATTACKING -> attack(buffs, tpf);
       case COOLDOWN -> cooldown(tpf);
-    }
+    };
   }
 
   @Override
@@ -42,22 +42,24 @@ public class RotaryBehaviour implements AttackBehaviour {
     duration = MathUtil.subtractDuration(duration, tpf);
   }
 
-  private void cooldown(float tpf) {
+  private boolean cooldown(float tpf) {
     if (duration.isZero()) {
       status = RotaryStatus.ATTACKING;
       duration = attackDuration;
     }
     tick(tpf);
+    return false;
   }
 
-  private void attack(List<Upgrade> buffs, float tpf) {
-    attacks.get(attackIndex).tryAttack(buffs, tpf);
+  private boolean attack(List<Upgrade> buffs, float tpf) {
+    var result = attacks.get(attackIndex).tryAttack(buffs, tpf);
     tick(tpf);
     if (duration.isZero()) {
       status = RotaryStatus.COOLDOWN;
       duration = cooldownDuration;
       attackIndex = nextIndex(attacks.size(), attackIndex);
     }
+    return result;
   }
 
   private static int nextIndex(int size, int index) {

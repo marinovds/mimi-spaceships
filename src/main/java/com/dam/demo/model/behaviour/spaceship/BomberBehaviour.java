@@ -1,20 +1,21 @@
 package com.dam.demo.model.behaviour.spaceship;
 
 import static com.dam.util.RandomUtil.RANDOM;
+import static java.lang.Math.signum;
 
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.attack.SpaceshipAttack;
-import com.dam.demo.util.DamageUtil;
+import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
 import com.dam.demo.util.JsonUtil;
 import com.jme3.math.FastMath;
 import com.jme3.scene.Spatial;
+import java.time.Duration;
 
 public class BomberBehaviour extends SpaceshipBehaviourBase {
 
-  private final Damage damage;
+  private final CollisionBehaviour collision;
 
   private float widthDirection;
   private float heightDirection;
@@ -23,7 +24,11 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
   public BomberBehaviour(Spaceship spaceship) {
     super(spaceship);
     var attack = JsonUtil.read(spaceship.attack(), BomberAttack.class);
-    this.damage = Damage.collision(attack.collision());
+    this.collision = new CollisionBehaviour(
+        attack.collision(),
+        Duration.ofMillis(500),
+        Duration.ofSeconds(1)
+    );
 
     widthDirection = randomDirection();
     heightDirection = randomDirection();
@@ -61,18 +66,27 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
   }
 
   @Override
-  public void onCollision(Spatial spatial) {
-    if (ShipType.PLAYER.is(spatial)) {
-      DamageUtil.hit(spatial, buffDamage(damage));
+  public void onCollision(Spatial spatial, float tpf) {
+    if (ShipType.PLAYER.is(spatial) && collision.tryAttack(spatial, buffs, tpf)) {
+        revertDirection();
+        return;
     }
-    widthDirection = -widthDirection;
-    heightDirection = -heightDirection;
+
+    if (!collision.ignoreFriendlyCollision()) {
+      revertDirection();
+      collision.friendlyCollided();
+    }
+  }
+
+  private void revertDirection() {
+    widthDirection = -signum(widthDirection) * randomDirection();
+    heightDirection = -signum(heightDirection) * randomDirection();
     rotation = 4f + RANDOM.nextFloat();
   }
 
   @Override
   public void attack(float tpf) {
-    // The Bomber collides - no attack
+    collision.tick(tpf);
   }
 
   private static float randomDirection() {

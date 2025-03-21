@@ -67,7 +67,7 @@ public enum EnemySpawner {
     var spatial = spaceship.spatial();
     spatial.setName(enemy + "_" + UUID.randomUUID());
     spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
-    spatial.addControl(new SpaceshipControl(spaceship, definition.behaviour().apply(spaceship)));
+    spatial.addControl(new SpaceshipControl(definition.behaviour().apply(spaceship)));
 
     return Optional.of(spaceship);
   }

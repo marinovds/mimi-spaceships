@@ -60,7 +60,7 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
   }
 
   @Override
-  public void onCollision(Spatial spatial) {
+  public void onCollision(Spatial spatial, float tpf) {
     // No collision amount
   }
 

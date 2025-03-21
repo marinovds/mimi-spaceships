@@ -48,7 +48,7 @@ public class Boss1Behaviour extends SpaceshipBehaviourBase {
   }
 
   @Override
-  public void onCollision(Spatial spatial) {
+  public void onCollision(Spatial spatial, float tpf) {
     // Boss1 doesn't collide
   }
 
