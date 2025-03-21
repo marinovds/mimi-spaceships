@@ -6,10 +6,10 @@ import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.util.RandomUtil.RANDOM;
 
 import com.dam.demo.controls.SpaceshipControl;
-import com.dam.demo.controls.behaviour.spaceship.BomberBehaviour;
-import com.dam.demo.controls.behaviour.spaceship.Boss1Behaviour;
-import com.dam.demo.controls.behaviour.spaceship.ChaserBehaviour;
-import com.dam.demo.controls.behaviour.spaceship.CruiserBehaviour;
+import com.dam.demo.model.behaviour.spaceship.BomberBehaviour;
+import com.dam.demo.model.behaviour.spaceship.Boss1Behaviour;
+import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour;
+import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour;
 import com.dam.demo.game.SpaceshipDefinitions;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.Spaceship;

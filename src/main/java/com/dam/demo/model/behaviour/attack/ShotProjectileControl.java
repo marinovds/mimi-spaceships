@@ -1,4 +1,4 @@
-package com.dam.demo.controls.behaviour.attack;
+package com.dam.demo.model.behaviour.attack;
 
 import static com.dam.demo.util.AssetUtil.checkBoundaries;
 

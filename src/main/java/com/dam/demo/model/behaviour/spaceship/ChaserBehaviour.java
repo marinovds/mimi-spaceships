@@ -1,4 +1,4 @@
-package com.dam.demo.controls.behaviour.spaceship;
+package com.dam.demo.model.behaviour.spaceship;
 
 import static com.dam.demo.game.Scene.PLAYER;
 import static com.dam.demo.util.MathUtil.angleFromVector;

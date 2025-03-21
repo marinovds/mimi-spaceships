@@ -4,7 +4,7 @@ import static com.dam.demo.util.AssetUtil.checkBoundaries;
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.collided;
 
-import com.dam.demo.controls.behaviour.spaceship.SpaceshipBehaviour;
+import com.dam.demo.model.behaviour.spaceship.SpaceshipBehaviour;
 import com.dam.demo.game.Scene;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.Spaceship;

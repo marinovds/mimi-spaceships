@@ -1,5 +1,6 @@
-package com.dam.demo.controls.behaviour.attack;
+package com.dam.demo.model.behaviour.attack;
 
+import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.util.MathUtil;
 import java.time.Duration;
 import java.util.List;
@@ -28,9 +29,9 @@ public class RotaryBehaviour implements AttackBehaviour {
   }
 
   @Override
-  public void tryAttack(float tpf) {
+  public void tryAttack(List<Upgrade> buffs, float tpf) {
     switch (status) {
-      case ATTACKING -> attack(tpf);
+      case ATTACKING -> attack(buffs, tpf);
       case COOLDOWN -> cooldown(tpf);
     }
   }
@@ -38,12 +39,6 @@ public class RotaryBehaviour implements AttackBehaviour {
   @Override
   public void tick(float tpf) {
     duration = MathUtil.subtractDuration(duration, tpf);
-  }
-
-  public RotaryBehaviour setAttacks(List<ShotBehaviour> attacks) {
-    this.attacks = attacks;
-
-    return this;
   }
 
   private void cooldown(float tpf) {
@@ -54,8 +49,8 @@ public class RotaryBehaviour implements AttackBehaviour {
     tick(tpf);
   }
 
-  private void attack(float tpf) {
-    attacks.get(attackIndex).tryAttack(tpf);
+  private void attack(List<Upgrade> buffs, float tpf) {
+    attacks.get(attackIndex).tryAttack(buffs, tpf);
     tick(tpf);
     if (duration.isZero()) {
       status = RotaryStatus.COOLDOWN;

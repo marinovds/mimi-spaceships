@@ -1,23 +1,21 @@
-package com.dam.demo.controls.behaviour.spaceship;
+package com.dam.demo.model.behaviour.spaceship;
 
 import static com.dam.demo.controls.Input.DOWN;
 import static com.dam.demo.controls.Input.SHOOT;
 import static com.dam.demo.controls.Input.UP;
 
-import com.dam.demo.controls.behaviour.attack.ShotBehaviour;
 import com.dam.demo.listeners.KeyboardListener;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
-import com.dam.demo.model.upgrade.UpgradeUtil;
+import com.dam.demo.model.behaviour.attack.ShotBehaviour;
 import com.dam.demo.util.JsonUtil;
 import com.jme3.scene.Spatial;
 import java.util.function.Consumer;
 
 public class PlayerBehaviour extends SpaceshipBehaviourBase {
 
-  private final PlayerAttack attack;
   private final ShotBehaviour behaviour;
 
   private boolean topReached;
@@ -25,7 +23,7 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
 
   public PlayerBehaviour(Spaceship spaceship) {
     super(spaceship);
-    this.attack = JsonUtil.read(spaceship.attack(), PlayerAttack.class);
+    var attack = JsonUtil.read(spaceship.attack(), PlayerAttack.class);
     this.behaviour = new ShotBehaviour(spaceship, attack.shot());
     this.topReached = false;
     this.bottomReached = false;
@@ -68,12 +66,11 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void attack(float tpf) {
-    var upgraded = UpgradeUtil.upgradeShot(attack.shot(), buffs);
     Consumer<ShotBehaviour> f = KeyboardListener.INPUTS.get(SHOOT)
-        ? x -> x.tryAttack(tpf)
+        ? x -> x.tryAttack(buffs, tpf)
         : x -> x.tick(tpf);
 
-    f.accept(behaviour.setShot(upgraded));
+    f.accept(behaviour);
   }
 
   public record PlayerAttack(Shot shot) implements SpaceshipAttack{}

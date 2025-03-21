@@ -1,4 +1,7 @@
-package com.dam.demo.controls.behaviour.attack;
+package com.dam.demo.model.behaviour.attack;
+
+import com.dam.demo.model.upgrade.Upgrade;
+import java.util.List;
 
 public interface AttackBehaviour {
 
@@ -8,7 +11,7 @@ public interface AttackBehaviour {
    *
    * @param tpf the time per frame in seconds
    */
-  void tryAttack(float tpf);
+  void tryAttack(List<Upgrade> buffs, float tpf);
 
   /**
    * Tick the duration of the attack behaviour despite not attacking.

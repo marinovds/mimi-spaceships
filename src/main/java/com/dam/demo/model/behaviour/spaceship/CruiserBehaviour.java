@@ -1,11 +1,10 @@
-package com.dam.demo.controls.behaviour.spaceship;
+package com.dam.demo.model.behaviour.spaceship;
 
-import com.dam.demo.controls.behaviour.attack.ShotBehaviour;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
-import com.dam.demo.model.upgrade.UpgradeUtil;
+import com.dam.demo.model.behaviour.attack.ShotBehaviour;
 import com.dam.demo.util.JsonUtil;
 import com.dam.util.RandomUtil;
 import com.jme3.scene.Spatial;
@@ -51,8 +50,7 @@ public class CruiserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
-      var shot = UpgradeUtil.upgradeShot(attack.shot(), buffs);
-      behaviour.setShot(shot).tryAttack(tpf);
+      behaviour.tryAttack(buffs, tpf);
     }
   }
 

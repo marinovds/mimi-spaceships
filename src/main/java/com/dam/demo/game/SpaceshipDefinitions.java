@@ -8,11 +8,11 @@ import static com.dam.demo.enemies.Tag.EnemyType.CRUISER;
 import static com.dam.demo.enemies.Tag.ShipType.ENEMY;
 import static com.dam.demo.model.attack.Damage.bullet;
 
-import com.dam.demo.controls.behaviour.spaceship.BomberBehaviour.BomberAttack;
-import com.dam.demo.controls.behaviour.spaceship.Boss1Behaviour.Boss1Attack;
-import com.dam.demo.controls.behaviour.spaceship.ChaserBehaviour.ChaserAttack;
-import com.dam.demo.controls.behaviour.spaceship.CruiserBehaviour.CruiserAttack;
-import com.dam.demo.controls.behaviour.spaceship.PlayerBehaviour.PlayerAttack;
+import com.dam.demo.model.behaviour.spaceship.BomberBehaviour.BomberAttack;
+import com.dam.demo.model.behaviour.spaceship.Boss1Behaviour.Boss1Attack;
+import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour.ChaserAttack;
+import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour.CruiserAttack;
+import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour.PlayerAttack;
 import com.dam.demo.enemies.Tag.ArmorType;
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.enemies.Tag.SpatialType;

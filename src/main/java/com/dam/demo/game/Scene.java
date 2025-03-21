@@ -7,7 +7,7 @@ import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.demo.util.AssetUtil.spaceship;
 
 import com.dam.demo.controls.SpaceshipControl;
-import com.dam.demo.controls.behaviour.spaceship.PlayerBehaviour;
+import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour;
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.util.AssetUtil;
 import com.jme3.font.BitmapText;

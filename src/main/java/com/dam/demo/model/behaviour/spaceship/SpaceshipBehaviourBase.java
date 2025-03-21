@@ -1,4 +1,4 @@
-package com.dam.demo.controls.behaviour.spaceship;
+package com.dam.demo.model.behaviour.spaceship;
 
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Damage;

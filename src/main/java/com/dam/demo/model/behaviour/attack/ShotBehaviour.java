@@ -1,7 +1,8 @@
-package com.dam.demo.controls.behaviour.attack;
+package com.dam.demo.model.behaviour.attack;
 
 import static com.dam.demo.game.Scene.ENEMY_BULLETS;
 import static com.dam.demo.game.Scene.PLAYER_BULLETS;
+import static com.dam.demo.model.upgrade.UpgradeUtil.upgradeShot;
 import static com.dam.demo.util.MathUtil.getAimDirection;
 
 import com.dam.demo.enemies.Tag.ShipType;
@@ -9,6 +10,7 @@ import com.dam.demo.game.Scene;
 import com.dam.demo.game.SoundUtil;
 import com.dam.demo.model.Spaceship;
 import com.dam.demo.model.attack.Shot;
+import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.MathUtil;
 import com.jme3.math.ColorRGBA;
@@ -37,13 +39,13 @@ public class ShotBehaviour implements AttackBehaviour {
   }
 
   @Override
-  public void tryAttack(float tpf) {
+  public void tryAttack(List<Upgrade> buffs, float tpf) {
     if (cooldown.isPositive()) {
       tick(tpf);
       return;
     }
     cooldown = shot.cooldown();
-    var shot = shoot(spaceship, aim, this.shot);
+    var shot = shoot(spaceship, aim, upgradeShot(this.shot, buffs));
     var node = spaceship.is(ShipType.PLAYER) ? PLAYER_BULLETS : ENEMY_BULLETS;
     node.attachChild(shot);
   }
@@ -124,10 +126,5 @@ public class ShotBehaviour implements AttackBehaviour {
       return getAimDirection(spaceship.location()).negate();
     }
     return getAimDirection(spaceship.location());
-  }
-
-  public ShotBehaviour setShot(Shot shot) {
-    this.shot = shot;
-    return this;
   }
 }
