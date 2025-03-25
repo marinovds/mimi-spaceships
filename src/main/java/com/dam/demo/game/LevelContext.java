@@ -107,6 +107,7 @@ public final class LevelContext implements GameContext {
     enemyBullets.getChildren().forEach(Spatial::removeFromParent);
     playerBullets.getChildren().forEach(Spatial::removeFromParent);
     buffs.getChildren().forEach(Spatial::removeFromParent);
+    particles.getChildren().forEach(Spatial::removeFromParent);
   }
 
   private Spaceship player() {
