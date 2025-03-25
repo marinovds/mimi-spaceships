@@ -1,22 +1,22 @@
 package com.dam.demo.enemies;
 
-import static com.dam.demo.game.Scene.ENEMIES;
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.util.RandomUtil.RANDOM;
 
 import com.dam.demo.controls.SpaceshipControl;
+import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.behaviour.spaceship.BomberBehaviour;
 import com.dam.demo.model.behaviour.spaceship.Boss1Behaviour;
 import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour;
 import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour;
-import com.dam.demo.game.SpaceshipDefinitions;
-import com.dam.demo.model.Dimensions;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.spaceship.Spaceship;
+import com.dam.demo.model.spaceship.SpaceshipDefinitions;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.LangUtil;
 import com.dam.demo.util.MathUtil;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -50,19 +50,19 @@ public enum EnemySpawner {
       ChaserBehaviour::new
   );
 
-  public static Optional<Spaceship> createEnemy(EnemyDef definition, float tpf) {
+  public static Optional<Spaceship> createEnemy(Node enemyNode, EnemyDef definition, float tpf) {
     var enemyDef = definition.spaceship();
     var criteria = definition.spawn();
     var enemy = enemyDef.name();
-    var enemies = getEnemiesOfType(enemy);
-    if (shouldNotSpawn(enemy, criteria, enemies)) {
-      var cooldown = MathUtil.subtractDuration(getEnemyCooldown(enemy), tpf);
-      setEnemyCooldown(enemy, cooldown);
+    var enemies = getEnemiesOfType(enemyNode, enemy);
+    if (shouldNotSpawn(enemyNode, enemy, criteria, enemies)) {
+      var cooldown = MathUtil.subtractDuration(getEnemyCooldown(enemyNode, enemy), tpf);
+      setEnemyCooldown(enemyNode, enemy, cooldown);
 
       return Optional.empty();
     }
 
-    setEnemyCooldown(enemy, definition.spawn().cooldown());
+    setEnemyCooldown(enemyNode, enemy, definition.spawn().cooldown());
     var spaceship = AssetUtil.spaceship(enemyDef);
     var spatial = spaceship.spatial();
     spatial.setName(enemy + "_" + UUID.randomUUID());
@@ -73,6 +73,7 @@ public enum EnemySpawner {
   }
 
   private static boolean shouldNotSpawn(
+      Node enemyNode,
       String enemy,
       SpawnCriteria criteria,
       List<Spaceship> enemies) {
@@ -81,23 +82,23 @@ public enum EnemySpawner {
     }
 
     return enemies.size() >= criteria.maxNumber()
-        || getEnemyCooldown(enemy).isPositive()
+        || getEnemyCooldown(enemyNode, enemy).isPositive()
         || RANDOM.nextInt(criteria.random()) != 0;
   }
 
-  private static Duration getEnemyCooldown(String name) {
-    var result = LangUtil.mapNull(ENEMIES.getUserData(name), Duration::parse);
+  private static Duration getEnemyCooldown(Node enemyNode, String name) {
+    var result = LangUtil.mapNull(enemyNode.getUserData(name), Duration::parse);
     return result == null
         ? Duration.ZERO
         : result;
   }
 
-  private static void setEnemyCooldown(String name, Duration duration) {
-    ENEMIES.setUserData(name, duration.toString());
+  private static void setEnemyCooldown(Node enemyNode, String name, Duration duration) {
+    enemyNode.setUserData(name, duration.toString());
   }
 
-  private static List<Spaceship> getEnemiesOfType(String type) {
-    return ENEMIES.getChildren()
+  private static List<Spaceship> getEnemiesOfType(Node enemyNode, String type) {
+    return enemyNode.getChildren()
         .stream()
         .filter(x -> x.getName().startsWith(type))
         .map(Spaceship::of)

@@ -1,8 +1,9 @@
-package com.dam.demo.game;
+package com.dam.demo.controls;
 
 import static com.dam.util.RandomUtil.RANDOM;
 
-import com.dam.demo.controls.ParticleControl;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.util.AssetUtil;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -14,17 +15,17 @@ public enum ParticleManager {
   private static final Spatial PARTICLE = AssetUtil.projectile("particle");
 
   public static void explosion(Vector3f position, int numberOfParticles) {
+    var color = ColorRGBA.Yellow.clone();
+    color.interpolateLocal(ColorRGBA.randomColor(), RANDOM.nextFloat());
 
     // create particles
     for (int i = 0; i < numberOfParticles; i++) {
       var velocity = getRandomVelocity(250);
       var particle = PARTICLE.clone();
       particle.setLocalTranslation(position);
-      var color = ColorRGBA.Yellow;
-      color.interpolateLocal(ColorRGBA.randomColor(), RANDOM.nextFloat());
 
       particle.addControl(new ParticleControl(velocity, color));
-      Scene.PARTICLES.attachChild(particle);
+      Contexts.contextByClass(LevelContext.class).particles.attachChild(particle);
     }
   }
 

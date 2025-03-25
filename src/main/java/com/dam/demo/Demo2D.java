@@ -1,9 +1,10 @@
 package com.dam.demo;
 
-import static com.dam.demo.controls.Input.DOWN;
-import static com.dam.demo.controls.Input.PAUSE;
-import static com.dam.demo.controls.Input.SHOOT;
-import static com.dam.demo.controls.Input.UP;
+import static com.dam.demo.listeners.KeyboardListener.Input.DOWN;
+import static com.dam.demo.listeners.KeyboardListener.Input.PAUSE;
+import static com.dam.demo.listeners.KeyboardListener.Input.SELECT;
+import static com.dam.demo.listeners.KeyboardListener.Input.SHOOT;
+import static com.dam.demo.listeners.KeyboardListener.Input.UP;
 import static com.jme3.input.KeyInput.KEY_D;
 import static com.jme3.input.KeyInput.KEY_DOWN;
 import static com.jme3.input.KeyInput.KEY_ESCAPE;
@@ -14,11 +15,10 @@ import static com.jme3.input.KeyInput.KEY_SPACE;
 import static com.jme3.input.KeyInput.KEY_UP;
 import static com.jme3.input.KeyInput.KEY_W;
 
-import com.dam.demo.game.Level;
-import com.dam.demo.game.Scene;
-import com.dam.demo.game.SoundUtil;
+import com.dam.demo.game.Contexts;
 import com.dam.demo.listeners.KeyboardListener;
 import com.dam.demo.util.AssetUtil;
+import com.dam.demo.util.SoundUtil;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Vector3f;
@@ -38,7 +38,8 @@ public class Demo2D extends SimpleApplication {
   @Override
   public void simpleInitApp() {
     AssetUtil.initialize(assetManager, settings);
-    Scene.initialize(guiNode);
+    Contexts.initialize(this);
+
     // setup camera for 2D games
     cam.setParallelProjection(true);
     cam.setLocation(new Vector3f(0, 0, 0.5f));
@@ -56,7 +57,7 @@ public class Demo2D extends SimpleApplication {
 
   @Override
   public void simpleUpdate(float tpf) {
-    Level.tick(tpf);
+    Contexts.onTick(tpf);
   }
 
   private void addInputs() {
@@ -64,7 +65,8 @@ public class Demo2D extends SimpleApplication {
     inputManager.clearMappings();
 
     var keyboardListener = new KeyboardListener();
-    inputManager.addMapping(PAUSE.key, new KeyTrigger(KEY_ESCAPE), new KeyTrigger(KEY_RETURN));
+    inputManager.addMapping(PAUSE.key, new KeyTrigger(KEY_ESCAPE));
+    inputManager.addMapping(SELECT.key, new KeyTrigger(KEY_RETURN));
     inputManager.addMapping(UP.key, new KeyTrigger(KEY_W), new KeyTrigger(KEY_UP));
     inputManager.addMapping(DOWN.key, new KeyTrigger(KEY_S), new KeyTrigger(KEY_DOWN));
     inputManager.addMapping(SHOOT.key,
@@ -72,9 +74,10 @@ public class Demo2D extends SimpleApplication {
         new KeyTrigger(KEY_D),
         new KeyTrigger(KEY_SPACE));
 
+    inputManager.addListener(keyboardListener, PAUSE.key);
+    inputManager.addListener(keyboardListener, SELECT.key);
     inputManager.addListener(keyboardListener, UP.key);
     inputManager.addListener(keyboardListener, DOWN.key);
     inputManager.addListener(keyboardListener, SHOOT.key);
-    inputManager.addListener(keyboardListener, PAUSE.key);
   }
 }

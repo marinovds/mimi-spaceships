@@ -4,7 +4,8 @@ import static com.dam.demo.util.AssetUtil.checkBoundaries;
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.collided;
 
-import com.dam.demo.game.Scene;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.behaviour.spaceship.SpaceshipBehaviour;
 import com.dam.demo.model.upgrade.Buff;
@@ -43,8 +44,8 @@ public final class SpaceshipControl extends AbstractControl {
     var boundary = checkBoundaries(spatial.getLocalTranslation(), Dimensions.of(spatial));
     behaviour.onBoundary(boundary);
     var collisions = Stream.concat(
-            Scene.ENEMIES.getChildren().stream(),
-            Stream.of(Scene.PLAYER.spatial())
+            Contexts.contextByClass(LevelContext.class).enemies.getChildren().stream(),
+            Stream.of(Contexts.contextByClass(LevelContext.class).player.spatial())
         )
         .filter(x -> spatial != x) // Ignore yourself
         .filter(x -> collided(spatial, x))
@@ -108,4 +109,7 @@ public final class SpaceshipControl extends AbstractControl {
     }
   }
 
+  public SpaceshipBehaviour getBehaviour() {
+    return behaviour;
+  }
 }

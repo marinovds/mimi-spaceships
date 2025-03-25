@@ -1,6 +1,5 @@
 package com.dam.demo.model.upgrade;
 
-import static com.dam.demo.game.Scene.BUFFS;
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.decreaseDuration;
 import static com.dam.demo.util.MathUtil.getAimDirection;
@@ -9,12 +8,15 @@ import static com.dam.util.RandomUtil.RANDOM;
 import static com.dam.util.RandomUtil.weighted;
 
 import com.dam.demo.controls.BonusControl;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.attack.Shot;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.MathUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
@@ -22,6 +24,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public enum UpgradeUtil {
   ;
@@ -31,6 +34,17 @@ public enum UpgradeUtil {
   public static final ColorRGBA COLOR_ATTACK_SPEED = ColorRGBA.Green;
   public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.LightGray;
 
+  public static String toString(List<Upgrade> upgrades) {
+    return JsonUtil.write(upgrades);
+  }
+
+  public static List<Upgrade> parse(String value) {
+    if (value == null) {
+      return List.of();
+    }
+
+    return JsonUtil.read(value, new TypeReference<>() {});
+  }
   public static void spawnBonus(Vector3f location) {
     if (RANDOM.nextInt(4) != 0) {
       return;
@@ -46,7 +60,7 @@ public enum UpgradeUtil {
         option(1, bonus("buffShot", location, buff(new Upgrade(100, UpgradeType.SHOT_SPEED))))
     );
 
-    BUFFS.attachChild(buff);
+    Contexts.contextByClass(LevelContext.class).buffs.attachChild(buff);
   }
 
   private static Supplier<Spatial> bonus(String name, Vector3f location, Consumer<Spaceship> f) {
@@ -76,23 +90,30 @@ public enum UpgradeUtil {
       return shot;
     }
     var result = shot;
-    for (var upgrade : upgrades) {
+    for (var upgrade : mergeStats(upgrades)) {
       result = upgradeShot(result, upgrade);
     }
     return result;
   }
 
-  public static Damage upgradeDamage(Damage damage, List<Upgrade> upgrades) {
-    return upgrades.stream()
-        .filter(x -> x.type() == UpgradeType.ATTACK_DAMAGE)
-        .findFirst()
-        .map(x -> MathUtil.apply(damage.amount(), x.percentage()))
-        .map(x -> new Damage(x, damage.type()))
-        .orElse(damage);
+  private static List<Upgrade> mergeStats(List<Upgrade> upgrades) {
+    var merged = upgrades.stream()
+        .collect(Collectors.toMap(Upgrade::type, Upgrade::percentage, Integer::sum));
+
+    return merged.entrySet()
+        .stream()
+        .map(x -> new Upgrade(x.getValue(), x.getKey()))
+        .toList();
   }
 
-  public static String toString(List<Upgrade> upgrades) {
-    return JsonUtil.write(upgrades);
+  public static Damage upgradeDamage(Damage damage, List<Upgrade> upgrades) {
+    var increase = upgrades.stream()
+        .filter(x -> x.type() == UpgradeType.ATTACK_DAMAGE)
+        .mapToInt(Upgrade::percentage)
+        .sum();
+    var amount = MathUtil.apply(damage.amount(), increase);
+
+    return new Damage(amount, damage.type());
   }
 
   public static Shot upgradeShot(Shot shot, Upgrade upgrade) {

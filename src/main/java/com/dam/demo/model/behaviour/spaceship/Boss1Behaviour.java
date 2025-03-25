@@ -1,7 +1,7 @@
 package com.dam.demo.model.behaviour.spaceship;
 
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.RotaryBehaviour;
@@ -54,7 +54,7 @@ public class Boss1Behaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void attack(float tpf) {
-    behaviour.tryAttack(buffs, tpf);
+    behaviour.tryAttack(improvements(), tpf);
   }
 
   public record Boss1Attack(

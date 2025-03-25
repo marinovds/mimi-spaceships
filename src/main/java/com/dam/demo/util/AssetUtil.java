@@ -6,9 +6,10 @@ import static com.dam.demo.model.UserConstants.TAGS;
 
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Dimensions;
-import com.dam.demo.model.Spaceship;
-import com.dam.demo.model.SpaceshipDefinition;
+import com.dam.demo.model.spaceship.Spaceship;
+import com.dam.demo.model.spaceship.SpaceshipDefinition;
 import com.jme3.asset.AssetManager;
+import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -138,7 +139,15 @@ public enum AssetUtil {
           "Incorrect spatial passed. Node expected, but got " + spatial.getClass().getSimpleName());
     }
     var image = (Picture) ((Node) spatial).getChild(0);
-    ;
+
     return (ColorRGBA) image.getMaterial().getParam("Color").getValue();
+  }
+
+  public static BitmapText text(int size) {
+    var font = manager.loadFont("Interface/Fonts/Default.fnt");
+    var text = new BitmapText(font);
+    text.setSize(size);
+
+    return text;
   }
 }

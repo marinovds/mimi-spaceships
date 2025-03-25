@@ -1,66 +1,52 @@
 package com.dam.demo.game;
 
-import static com.dam.demo.game.Scene.PLAYER;
-import static com.dam.demo.util.AssetUtil.manager;
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
+import static com.dam.demo.util.AssetUtil.text;
 
+import com.dam.demo.model.spaceship.Spaceship;
 import com.jme3.font.BitmapText;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import java.util.List;
+import java.util.function.Function;
 
 public class Hud {
 
   private static final float OFFSET = 100;
+
   private final Node spatial;
-  private final BitmapText health;
-  private final BitmapText score;
-  private final BitmapText coins;
-  private final BitmapText level;
+  private final List<HudEntry> entries;
 
 
   private Hud(
       Node spatial,
-      BitmapText health,
-      BitmapText score,
-      BitmapText coins,
-      BitmapText level) {
+      List<HudEntry> entries) {
     this.spatial = spatial;
-    this.health = health;
-    this.score = score;
-    this.coins = coins;
-    this.level = level;
+    this.entries = entries;
   }
 
   public static Hud initialize() {
     var result = new Node("hud");
-    var health = createText();
-    result.attachChild(health);
+    var entries = List.of(
+        createText("Health", Spaceship::health),
+        createText("Coins", Spaceship::coins),
+        createText("Score", Spaceship::points),
+        createText("Level", (x) -> LevelContext.level)
+    );
 
-    var coins = createText();
-    result.attachChild(coins);
+    entries.forEach(x -> result.attachChild(x.spatial()));
 
-    var score = createText();
-    result.attachChild(score);
-    var level = createText();
-    result.attachChild(level);
-
-    return new Hud(result, health, score, coins, level);
+    return new Hud(result, entries);
   }
 
-  private static BitmapText createText() {
-    var font = manager.loadFont("Interface/Fonts/Default.fnt");
-    var result = new BitmapText(font);
-    result.setSize(30);
+  private static HudEntry createText(String type, Function<Spaceship, Integer> value) {
 
-    return result;
+    return new HudEntry(text(30), type, value);
   }
 
-  public void update() {
-    health.setText("Health: " + PLAYER.health());
-    coins.setText("Coins: " + PLAYER.coins());
-    score.setText("Score: " + PLAYER.points());
-    level.setText("Level: " + Level.level());
+  public void update(Spaceship player) {
+    entries.forEach(x -> x.visualize(player));
     centerHud();
   }
 
@@ -79,5 +65,12 @@ public class Hud {
 
   public Spatial spatial() {
     return spatial;
+  }
+
+  private record HudEntry(BitmapText spatial, String type, Function<Spaceship, Integer> value) {
+
+    void visualize(Spaceship spaceship) {
+      spatial.setText(type + ": " + value.apply(spaceship));
+    }
   }
 }

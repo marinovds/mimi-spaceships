@@ -1,11 +1,12 @@
 package com.dam.demo.controls;
 
-import static com.dam.demo.game.Scene.PLAYER;
 import static com.dam.demo.util.AssetUtil.checkBoundaries;
 
-import com.dam.demo.game.SoundUtil;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
+import com.dam.demo.util.SoundUtil;
 import com.dam.demo.model.Dimensions;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.MathUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
@@ -30,8 +31,8 @@ public class BonusControl extends AbstractControl {
     var dimensions = Dimensions.of(spatial);
     spatial.move(aim.mult(tpf * speed));
 
-    if (MathUtil.collided(PLAYER.spatial(), spatial)) {
-      bonus.accept(PLAYER);
+    if (MathUtil.collided(Contexts.contextByClass(LevelContext.class).player.spatial(), spatial)) {
+      bonus.accept(Contexts.contextByClass(LevelContext.class).player);
       SoundUtil.play("coin");
       spatial.removeFromParent();
     }

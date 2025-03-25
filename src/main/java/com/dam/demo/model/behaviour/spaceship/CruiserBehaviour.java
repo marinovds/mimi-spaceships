@@ -1,7 +1,7 @@
 package com.dam.demo.model.behaviour.spaceship;
 
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.Spaceship;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.ShotBehaviour;
@@ -50,7 +50,7 @@ public class CruiserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
-      behaviour.tryAttack(buffs, tpf);
+      behaviour.tryAttack(improvements(), tpf);
       return;
     }
     behaviour.tick(tpf);
