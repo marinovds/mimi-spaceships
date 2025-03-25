@@ -8,8 +8,8 @@ import static com.dam.util.RandomUtil.RANDOM;
 import static com.dam.util.RandomUtil.weighted;
 
 import com.dam.demo.controls.BonusControl;
-import com.dam.demo.game.context.Contexts;
-import com.dam.demo.game.context.LevelContext;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.spaceship.Spaceship;
@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public enum UpgradeUtil {
   ;
@@ -38,6 +39,10 @@ public enum UpgradeUtil {
   }
 
   public static List<Upgrade> parse(String value) {
+    if (value == null) {
+      return List.of();
+    }
+
     return JsonUtil.read(value, new TypeReference<>() {});
   }
   public static void spawnBonus(Vector3f location) {
@@ -85,19 +90,30 @@ public enum UpgradeUtil {
       return shot;
     }
     var result = shot;
-    for (var upgrade : upgrades) {
+    for (var upgrade : mergeStats(upgrades)) {
       result = upgradeShot(result, upgrade);
     }
     return result;
   }
 
+  private static List<Upgrade> mergeStats(List<Upgrade> upgrades) {
+    var merged = upgrades.stream()
+        .collect(Collectors.toMap(Upgrade::type, Upgrade::percentage, Integer::sum));
+
+    return merged.entrySet()
+        .stream()
+        .map(x -> new Upgrade(x.getValue(), x.getKey()))
+        .toList();
+  }
+
   public static Damage upgradeDamage(Damage damage, List<Upgrade> upgrades) {
-    return upgrades.stream()
+    var increase = upgrades.stream()
         .filter(x -> x.type() == UpgradeType.ATTACK_DAMAGE)
-        .findFirst()
-        .map(x -> MathUtil.apply(damage.amount(), x.percentage()))
-        .map(x -> new Damage(x, damage.type()))
-        .orElse(damage);
+        .mapToInt(Upgrade::percentage)
+        .sum();
+    var amount = MathUtil.apply(damage.amount(), increase);
+
+    return new Damage(amount, damage.type());
   }
 
   public static Shot upgradeShot(Shot shot, Upgrade upgrade) {

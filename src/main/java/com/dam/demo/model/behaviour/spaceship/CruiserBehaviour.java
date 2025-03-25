@@ -50,7 +50,7 @@ public class CruiserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
-      behaviour.tryAttack(buffs, tpf);
+      behaviour.tryAttack(improvements(), tpf);
       return;
     }
     behaviour.tick(tpf);

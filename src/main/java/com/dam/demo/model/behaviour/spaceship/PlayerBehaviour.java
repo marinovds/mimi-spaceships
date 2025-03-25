@@ -68,14 +68,14 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     Consumer<ShotBehaviour> f = inputs.get(SHOOT)
-        ? x -> x.tryAttack(buffs, tpf)
+        ? x -> x.tryAttack(improvements(), tpf)
         : x -> x.tick(tpf);
 
     f.accept(behaviour);
   }
 
-  public void onInput(Input input, Action action) {
-    inputs.put(input, action.isPressed());
+  public void onInput(Input input, boolean isPressed) {
+    inputs.put(input, isPressed);
   }
 
   public record PlayerAttack(Shot shot) implements SpaceshipAttack {

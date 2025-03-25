@@ -1,9 +1,8 @@
-package com.dam.demo.game.context;
+package com.dam.demo.game;
 
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
 
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.SoundUtil;
@@ -28,7 +27,7 @@ public final class ShopContext implements GameContext {
     var text = AssetUtil.text(60);
     text.setText("Shop");
     var x = (screenWidth() - text.getLineWidth()) / 2f;
-    var y = (screenHeight() - text.getHeight()) / 2f;
+    var y = screenHeight() / 2f;
     text.setLocalTranslation(x, y, 0);
     spatial.attachChild(text);
     guiNode.attachChild(spatial);
@@ -45,8 +44,8 @@ public final class ShopContext implements GameContext {
   }
 
   @Override
-  public void onInput(Input input, Action action) {
-    if (input != Input.SELECT || action == Action.RELEASE) {
+  public void onInput(Input input, boolean isPressed) {
+    if (!(input == Input.SELECT && !isPressed)) {
       return;
     }
     Contexts.contextByClass(LevelContext.class).nextLevel();

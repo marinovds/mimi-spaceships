@@ -15,7 +15,7 @@ import static com.jme3.input.KeyInput.KEY_SPACE;
 import static com.jme3.input.KeyInput.KEY_UP;
 import static com.jme3.input.KeyInput.KEY_W;
 
-import com.dam.demo.game.context.Contexts;
+import com.dam.demo.game.Contexts;
 import com.dam.demo.listeners.KeyboardListener;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.SoundUtil;

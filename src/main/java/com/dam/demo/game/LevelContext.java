@@ -1,4 +1,4 @@
-package com.dam.demo.game.context;
+package com.dam.demo.game;
 
 import static com.dam.demo.enemies.EnemySpawner.BOMBER_DEF;
 import static com.dam.demo.enemies.EnemySpawner.BOSS_1;
@@ -10,8 +10,6 @@ import static com.dam.demo.util.AssetUtil.spaceship;
 import com.dam.demo.controls.SpaceshipControl;
 import com.dam.demo.enemies.EnemyDef;
 import com.dam.demo.enemies.EnemySpawner;
-import com.dam.demo.game.Hud;
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour;
@@ -93,10 +91,10 @@ public final class LevelContext implements GameContext {
   }
 
   @Override
-  public void onInput(Input input, Action action) {
+  public void onInput(Input input, boolean isPressed) {
     var behaviour = (PlayerBehaviour) player.spatial().getControl(SpaceshipControl.class)
         .getBehaviour();
-    behaviour.onInput(input, action);
+    behaviour.onInput(input, isPressed);
   }
 
   public void reset() {

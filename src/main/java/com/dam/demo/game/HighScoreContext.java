@@ -1,4 +1,4 @@
-package com.dam.demo.game.context;
+package com.dam.demo.game;
 
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
@@ -27,7 +27,7 @@ public final class HighScoreContext implements GameContext {
     var text = AssetUtil.text(60);
     text.setText("Defeat");
     var x = (screenWidth() - text.getLineWidth()) / 2f;
-    var y = (screenHeight() - text.getHeight()) / 2f;
+    var y = screenHeight() / 2f;
     text.setLocalTranslation(x, y, 0);
     spatial.attachChild(text);
 
@@ -46,8 +46,8 @@ public final class HighScoreContext implements GameContext {
   }
 
   @Override
-  public void onInput(Input input, Action action) {
-    if (Input.SELECT == input && Action.PRESS == action) {
+  public void onInput(Input input, boolean isPressed) {
+    if (Input.SELECT == input && isPressed) {
       Contexts.switchContext(MenuContext.class);
     }
     // TODO;

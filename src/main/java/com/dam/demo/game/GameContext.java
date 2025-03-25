@@ -1,6 +1,5 @@
-package com.dam.demo.game.context;
+package com.dam.demo.game;
 
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 
 public sealed interface GameContext permits MenuContext, LevelContext, ShopContext, HighScoreContext {
@@ -11,5 +10,5 @@ public sealed interface GameContext permits MenuContext, LevelContext, ShopConte
 
   void disable();
 
-  void onInput(Input input, Action action);
+  void onInput(Input input, boolean isPressed);
 }

@@ -4,8 +4,8 @@ import static com.dam.demo.model.upgrade.UpgradeUtil.upgradeShot;
 import static com.dam.demo.util.MathUtil.getAimDirection;
 
 import com.dam.demo.enemies.Tag.ShipType;
-import com.dam.demo.game.context.Contexts;
-import com.dam.demo.game.context.LevelContext;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.upgrade.Upgrade;

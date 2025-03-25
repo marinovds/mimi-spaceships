@@ -4,7 +4,6 @@ import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.demo.util.AssetUtil.text;
 
-import com.dam.demo.game.context.LevelContext;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.jme3.font.BitmapText;
 import com.jme3.scene.Node;

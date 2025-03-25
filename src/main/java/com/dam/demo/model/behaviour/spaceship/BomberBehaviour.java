@@ -67,7 +67,7 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void onCollision(Spatial spatial, float tpf) {
-    if (ShipType.PLAYER.is(spatial) && collision.tryAttack(spatial, buffs, tpf)) {
+    if (ShipType.PLAYER.is(spatial) && collision.tryAttack(spatial, improvements(), tpf)) {
         revertDirection();
         return;
     }

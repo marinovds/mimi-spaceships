@@ -1,4 +1,4 @@
-package com.dam.demo.game.context;
+package com.dam.demo.game;
 
 import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
@@ -23,8 +23,8 @@ public class Contexts {
     currentContext.enable();
   }
 
-  public static void onInput(Input input, Action action) {
-    if (input == Input.PAUSE && action == Action.PRESS) {
+  public static void onInput(Input input, boolean isPressed) {
+    if (input == Input.PAUSE && isPressed) {
       if (currentContext == menu) {
         // Already in menu
         return;
@@ -32,7 +32,7 @@ public class Contexts {
       switchContext(MenuContext.class);
       return;
     }
-    currentContext.onInput(input, action);
+    currentContext.onInput(input, isPressed);
   }
 
   public static void switchContext(Class<? extends GameContext> context) {

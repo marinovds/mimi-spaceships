@@ -54,7 +54,7 @@ public class Boss1Behaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void attack(float tpf) {
-    behaviour.tryAttack(buffs, tpf);
+    behaviour.tryAttack(improvements(), tpf);
   }
 
   public record Boss1Attack(

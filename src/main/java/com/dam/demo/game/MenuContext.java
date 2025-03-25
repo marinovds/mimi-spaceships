@@ -1,10 +1,9 @@
-package com.dam.demo.game.context;
+package com.dam.demo.game;
 
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
 import static com.dam.demo.util.AssetUtil.text;
 
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.util.LangUtil;
 import com.jme3.app.SimpleApplication;
@@ -89,8 +88,8 @@ public final class MenuContext implements GameContext {
   }
 
   @Override
-  public void onInput(Input input, Action action) {
-    if (action != Action.PRESS || input == Input.SHOOT || input == Input.PAUSE) {
+  public void onInput(Input input, boolean isPressed) {
+    if (!isPressed || input == Input.SHOOT || input == Input.PAUSE) {
       return;
     }
     if (input == Input.SELECT) {

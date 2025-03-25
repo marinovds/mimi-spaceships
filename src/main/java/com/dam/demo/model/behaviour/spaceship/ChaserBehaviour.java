@@ -4,8 +4,8 @@ import static com.dam.demo.util.MathUtil.angleFromVector;
 
 import com.dam.demo.controls.ParticleManager;
 import com.dam.demo.enemies.Tag.ShipType;
-import com.dam.demo.game.context.Contexts;
-import com.dam.demo.game.context.LevelContext;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
@@ -68,7 +68,7 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void onCollision(Spatial spatial, float tpf) {
     if (ShipType.PLAYER.is(spatial)) {
-      collision.tryAttack(spatial, buffs, tpf);
+      collision.tryAttack(spatial, improvements(), tpf);
       spaceship.spatial().removeFromParent();
       ParticleManager.explosion(spaceship.location(), 10);
       return;

@@ -4,8 +4,8 @@ import static com.dam.demo.util.AssetUtil.checkBoundaries;
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.collided;
 
-import com.dam.demo.game.context.Contexts;
-import com.dam.demo.game.context.LevelContext;
+import com.dam.demo.game.Contexts;
+import com.dam.demo.game.LevelContext;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.behaviour.spaceship.SpaceshipBehaviour;
 import com.dam.demo.model.upgrade.Buff;
