@@ -1,6 +1,5 @@
 package com.dam.demo.game;
 
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.jme3.app.SimpleApplication;
 

@@ -42,12 +42,11 @@ public class CollisionBehaviour {
     friendlyCooldown = MathUtil.subtractDuration(friendlyCooldown, tpf);
   }
 
-
-  public boolean ignoreFriendlyCollision() {
-    return friendlyCooldown.isPositive();
-  }
-
-  public void friendlyCollided() {
+  public boolean friendlyCollided() {
+    if (friendlyCooldown.isPositive()) {
+      return false;
+    }
     this.friendlyCooldown = friendlyCollisionDuration;
+    return true;
   }
 }

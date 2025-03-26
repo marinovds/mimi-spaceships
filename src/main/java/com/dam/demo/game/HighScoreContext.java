@@ -3,7 +3,6 @@ package com.dam.demo.game;
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.screenWidth;
 
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.SoundUtil;

@@ -4,6 +4,8 @@ import static com.dam.demo.enemies.Tag.SpatialType.BONUS;
 import static com.dam.demo.enemies.Tag.SpatialType.PROJECTILE;
 import static com.dam.demo.model.UserConstants.TAGS;
 
+import com.dam.demo.enemies.Tag;
+import com.dam.demo.enemies.Tag.ProjectileType;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.spaceship.Spaceship;
@@ -19,6 +21,7 @@ import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture2D;
 import com.jme3.ui.Picture;
 import java.util.List;
+import java.util.Set;
 
 public enum AssetUtil {
   ;
@@ -40,11 +43,15 @@ public enum AssetUtil {
     return Spaceship.of(spatial);
   }
 
-  public static Spatial projectile(String name) {
+  public static Spatial projectile(String name, ProjectileType... tags) {
     var result = image(name);
-    result.setUserData("width", 0f);
-    result.setUserData("height", 0f);
-    result.setUserData(TAGS, new Object[]{PROJECTILE.name()});
+    var set = Set.<Tag>of(tags);
+    if (set.contains(ProjectileType.BULLET)) {
+      // Bullets do not have dimensions - better collision visualization
+      result.setUserData("width", 0f);
+      result.setUserData("height", 0f);
+    }
+    result.setUserData(TAGS, Tag.tags(set, PROJECTILE));
 
     return result;
   }

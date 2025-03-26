@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public final class LevelContext implements GameContext {
 
-  private static final int BASE_SCORE = 1_000;
+  private static final int BASE_SCORE = 3_000;
 
   private final Node guiNode;
 

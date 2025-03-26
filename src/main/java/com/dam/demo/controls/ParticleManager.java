@@ -2,6 +2,7 @@ package com.dam.demo.controls;
 
 import static com.dam.util.RandomUtil.RANDOM;
 
+import com.dam.demo.enemies.Tag.ProjectileType;
 import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
 import com.dam.demo.util.AssetUtil;
@@ -12,7 +13,7 @@ import com.jme3.scene.Spatial;
 public enum ParticleManager {
   ;
 
-  private static final Spatial PARTICLE = AssetUtil.projectile("particle");
+  private static final Spatial PARTICLE = AssetUtil.projectile("particle", ProjectileType.PARTICLE);
 
   public static void explosion(Vector3f position, int numberOfParticles) {
     var color = ColorRGBA.Yellow.clone();

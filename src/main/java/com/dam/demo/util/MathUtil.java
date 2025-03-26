@@ -31,8 +31,8 @@ public enum MathUtil {
 
     var dimA = Dimensions.of(a);
     var dimB = Dimensions.of(b);
-    var heightDiff = dimA.height() / 2 + dimB.height() / 2;
-    var widthDiff = dimA.width() / 2 + dimB.width() / 2;
+    var heightDiff = (dimA.height() + dimB.height()) / 2;
+    var widthDiff = (dimA.width() + dimB.width()) / 2;
 
     return abs(a.getLocalTranslation().x - b.getLocalTranslation().x) < widthDiff
         && abs(a.getLocalTranslation().y - b.getLocalTranslation().y) < heightDiff;

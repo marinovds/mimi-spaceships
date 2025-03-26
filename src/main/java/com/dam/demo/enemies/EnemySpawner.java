@@ -40,7 +40,7 @@ public enum EnemySpawner {
 
   public static final EnemyDef BOMBER_DEF = new EnemyDef(
       SpaceshipDefinitions.BOMBER_DEF,
-      new SpawnCriteria(Duration.ofSeconds(3), 300, 3),
+      new SpawnCriteria(Duration.ofSeconds(3), 300, 6),
       BomberBehaviour::new
   );
 

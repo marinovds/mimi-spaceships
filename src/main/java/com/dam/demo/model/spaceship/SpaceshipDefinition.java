@@ -13,7 +13,6 @@ import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.util.JsonUtil;
 import com.jme3.scene.Spatial;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public record SpaceshipDefinition(
     String name,
@@ -24,20 +23,12 @@ public record SpaceshipDefinition(
     int coins,
     int points) {
 
-  private static Object[] tags(Set<Tag> tags) {
-    return Stream.concat(
-            tags.stream(),
-            Stream.of(SPACESHIP)
-        )
-        .toArray(Object[]::new);
-  }
-
   public void applyTo(Spatial spatial) {
     spatial.setUserData(HEALTH, health);
     spatial.setUserData(SPEED, speed);
     spatial.setUserData(ATTACK, JsonUtil.write(attack));
     spatial.setUserData(COINS, coins);
     spatial.setUserData(POINTS, points);
-    spatial.setUserData(TAGS, tags(tags));
+    spatial.setUserData(TAGS, Tag.tags(tags, SPACESHIP));
   }
 }

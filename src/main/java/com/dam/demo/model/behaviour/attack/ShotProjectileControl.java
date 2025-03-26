@@ -39,7 +39,6 @@ public class ShotProjectileControl extends AbstractControl {
         .findFirst();
     if (collided.isPresent()) {
       spatial.removeFromParent();
-      enabled = false;
       var spatial = collided.get();
       DamageUtil.hit(spatial, shot.damage());
       return;

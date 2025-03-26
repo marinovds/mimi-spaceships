@@ -3,6 +3,7 @@ package com.dam.demo.model.behaviour.attack;
 import static com.dam.demo.model.upgrade.UpgradeUtil.upgradeShot;
 import static com.dam.demo.util.MathUtil.getAimDirection;
 
+import com.dam.demo.enemies.Tag.ProjectileType;
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
@@ -60,7 +61,7 @@ public class ShotBehaviour implements AttackBehaviour {
   private static Spatial shoot(Spaceship spaceship, Vector3f aim, Shot shot) {
     var spatial = switch (shot.damage().type()) {
       case BULLET -> bullet(spaceship);
-      case ROCKET -> rocket();
+      case ROCKET -> rocket(spaceship);
       case COLLISION -> throw new UnsupportedOperationException();
     };
 
@@ -78,14 +79,22 @@ public class ShotBehaviour implements AttackBehaviour {
     return spaceship.location().add(offset.negate());
   }
 
-  private static Spatial rocket() {
-    var rocket = AssetUtil.projectile("rocket");
+  private static Spatial rocket(Spaceship spaceship) {
+    var rocket = AssetUtil.projectile("rocket", ProjectileType.ROCKET);
+    if (spaceship.is(ShipType.PLAYER)) {
+      return rocket;
+    }
+
+    var color = AssetUtil.getColor(rocket);
+    AssetUtil.setColor(rocket, color.add(ColorRGBA.Red));
+    rocket.rotate(0, 0, FastMath.PI);
     SoundUtil.play("shot");
+
     return rocket;
   }
 
   private static Spatial bullet(Spaceship spaceship) {
-    var bullet = AssetUtil.projectile("bullet");
+    var bullet = AssetUtil.projectile("bullet", ProjectileType.BULLET);
     if (spaceship.is(ShipType.PLAYER)) {
       SoundUtil.play("shot");
 

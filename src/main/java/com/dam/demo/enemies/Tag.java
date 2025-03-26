@@ -12,53 +12,66 @@ import java.util.stream.Stream;
 
 public sealed interface Tag {
 
-    static Set<Tag> parse(Object[] data) {
-        return Stream.of(data)
-                .map(Object::toString)
-                .flatMap(x -> of(x).stream())
-                .collect(HashSet::new, Set::add, Set::addAll);
+  static Set<Tag> parse(Object[] data) {
+    return Stream.of(data)
+        .map(Object::toString)
+        .flatMap(x -> of(x).stream())
+        .collect(HashSet::new, Set::add, Set::addAll);
+  }
+
+  static Object[] tags(Set<Tag> tags, Tag other) {
+    return Stream.concat(
+            tags.stream(),
+            Stream.of(other)
+        )
+        .toArray(Object[]::new);
+  }
+
+  static Optional<Tag> of(String input) {
+    return Stream.of(
+            as(SpatialType::values, input),
+            as(ArmorType::values, input),
+            as(ShipType::values, input),
+            as(EnemyType::values, input),
+            as(ProjectileType::values, input)
+        )
+        .filter(Optional::isPresent)
+        .map(x -> (Tag) x.get())
+        .findFirst();
+  }
+
+  static <T extends Enum<T> & Tag> Optional<T> as(Supplier<T[]> f, String value) {
+    return Arrays.stream(f.get())
+        .filter(x -> x.name().equals(value))
+        .findFirst();
+  }
+
+  default boolean is(Spatial spatial) {
+    var tags = (Object[]) spatial.getUserData(TAGS);
+    if (tags == null) {
+      return false;
     }
 
-    static Optional<Tag> of(String input) {
-        return Stream.of(
-                        as(SpatialType::values, input),
-                        as(ArmorType::values, input),
-                        as(ShipType::values, input),
-                        as(EnemyType::values, input)
-                )
-                .filter(Optional::isPresent)
-                .map(x -> (Tag) x.get())
-                .findFirst();
-    }
+    return parse(tags).contains(this);
+  }
 
-    static <T extends Enum<T> & Tag> Optional<T> as(Supplier<T[]> f, String value) {
-        return Arrays.stream(f.get())
-                .filter(x -> x.name().equals(value))
-                .findFirst();
-    }
+  enum SpatialType implements Tag {
+    SPACESHIP, PROJECTILE, BONUS
+  }
 
-    default boolean is(Spatial spatial) {
-        var tags = (Object[]) spatial.getUserData(TAGS);
-        if (tags == null) {
-            return false;
-        }
+  enum ArmorType implements Tag {
+    HEAVY, LIGHT;
+  }
 
-        return parse(tags).contains(this);
-    }
+  enum ShipType implements Tag {
+    PLAYER, ENEMY, BOSS
+  }
 
-    enum SpatialType implements Tag {
-        SPACESHIP, PROJECTILE, BONUS
-    }
+  enum EnemyType implements Tag {
+    CRUISER, BOMBER, CHASER
+  }
 
-    enum ArmorType implements Tag {
-        HEAVY, LIGHT;
-    }
-
-    enum ShipType implements Tag {
-        PLAYER, ENEMY, BOSS
-    }
-
-    enum EnemyType implements Tag {
-        CRUISER, BOMBER, CHASER
-    }
+  enum ProjectileType implements Tag {
+    BULLET, ROCKET, PARTICLE
+  }
 }

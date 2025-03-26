@@ -12,13 +12,11 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.logging.Logger;
 
 public final class MenuContext implements GameContext {
 
   private static final int OFFSET = 100;
 
-  private final Logger log = Logger.getLogger("menu");
   private final Node guiNode;
   private final Node spatial;
   private final List<MenuOption> options;

@@ -72,9 +72,8 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
         return;
     }
 
-    if (!collision.ignoreFriendlyCollision()) {
+    if (collision.friendlyCollided()) {
       revertDirection();
-      collision.friendlyCollided();
     }
   }
 

@@ -5,14 +5,14 @@ import static com.dam.demo.model.UserConstants.LAST_HIT;
 import static com.dam.demo.util.MathUtil.isDead;
 import static java.lang.Math.max;
 
-import com.dam.demo.enemies.Tag.ArmorType;
-import com.dam.demo.enemies.Tag.ShipType;
-import com.dam.demo.enemies.Tag.SpatialType;
 import com.dam.demo.controls.ParticleManager;
+import com.dam.demo.enemies.Tag.ArmorType;
+import com.dam.demo.enemies.Tag.ProjectileType;
+import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
-import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.Damage;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.jme3.scene.Spatial;
 import java.time.Instant;
@@ -21,9 +21,10 @@ public enum DamageUtil {
   ;
 
   public static boolean hit(Spatial spatial, Damage damage) {
-    if (SpatialType.PROJECTILE.is(spatial)) {
+    if (ProjectileType.ROCKET.is(spatial)) {
       // This is a rocket. It should explode on impact
       spatial.removeFromParent();
+      return true;
     }
 
     return hit(Spaceship.of(spatial), damage);

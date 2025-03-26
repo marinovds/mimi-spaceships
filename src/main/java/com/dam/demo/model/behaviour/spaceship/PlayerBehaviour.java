@@ -4,7 +4,6 @@ import static com.dam.demo.listeners.KeyboardListener.Input.DOWN;
 import static com.dam.demo.listeners.KeyboardListener.Input.SHOOT;
 import static com.dam.demo.listeners.KeyboardListener.Input.UP;
 
-import com.dam.demo.listeners.KeyboardListener.Action;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.attack.Shot;

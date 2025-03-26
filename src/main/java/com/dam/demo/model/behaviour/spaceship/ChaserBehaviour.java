@@ -15,11 +15,8 @@ import com.dam.demo.util.LangUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.time.Duration;
-import java.util.logging.Logger;
 
 public class ChaserBehaviour extends SpaceshipBehaviourBase {
-
-  private static final Logger log = Logger.getLogger("test");
 
   private final int baseSpeed;
   private final float speedMult;
@@ -73,11 +70,10 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
       ParticleManager.explosion(spaceship.location(), 10);
       return;
     }
-    if (collision.ignoreFriendlyCollision()) {
-      return;
+
+    if (collision.friendlyCollided()) {
+      speed = calculateNewSpeed(-2);
     }
-    // Collided with an ally
-    speed = calculateNewSpeed(-2);
   }
 
   private int calculateNewSpeed(int mult) {
