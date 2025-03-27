@@ -31,6 +31,18 @@ public enum EnemySpawner {
       Boss1Behaviour::new
   );
 
+  public static final EnemyDef BOSS_2 = new EnemyDef(
+      SpaceshipDefinitions.BOSS_1_DEF,
+      SpawnCriteria.NONE,
+      Boss1Behaviour::new
+  );
+
+  public static final EnemyDef BOSS_3 = new EnemyDef(
+      SpaceshipDefinitions.BOSS_1_DEF,
+      SpawnCriteria.NONE,
+      Boss1Behaviour::new
+  );
+
   public static final EnemyDef CRUISER_DEF = new EnemyDef(
       SpaceshipDefinitions.CRUISER_DEF,
       new SpawnCriteria(Duration.ofSeconds(1), 150, 5),

@@ -1,7 +1,6 @@
 package com.dam.demo.game;
 
 import static com.dam.demo.enemies.EnemySpawner.BOMBER_DEF;
-import static com.dam.demo.enemies.EnemySpawner.BOSS_1;
 import static com.dam.demo.enemies.EnemySpawner.CHASER_DEF;
 import static com.dam.demo.enemies.EnemySpawner.CRUISER_DEF;
 import static com.dam.demo.util.AssetUtil.screenHeight;
@@ -16,9 +15,11 @@ import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.spaceship.SpaceshipDefinitions;
 import com.dam.demo.util.SoundUtil;
+import com.dam.util.RandomUtil;
 import com.jme3.app.SimpleApplication;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -27,13 +28,7 @@ public final class LevelContext implements GameContext {
   private static final int BASE_SCORE = 3_000;
 
   private final Node guiNode;
-
-  public final Node buffs;
-  public final Node playerBullets;
-  public final Node enemies;
-  public final Node enemyBullets;
-  public final Node particles;
-  public final Hud hud;
+  private final Hud hud;
 
   private LevelState state;
   public Spaceship player;
@@ -43,11 +38,6 @@ public final class LevelContext implements GameContext {
 
   LevelContext(SimpleApplication app) {
     this.guiNode = app.getGuiNode();
-    this.buffs = new Node("buffs");
-    this.playerBullets = new Node("playerBullets");
-    this.enemies = new Node("enemies");
-    this.enemyBullets = new Node("enemyBullets");
-    this.particles = new Node("particles");
     this.player = player();
     this.hud = Hud.initialize();
     this.state = LevelState.INIT;
@@ -58,11 +48,11 @@ public final class LevelContext implements GameContext {
     state = LevelState.ENEMY_SPAWNING;
     SoundUtil.music("ambient");
 
-    guiNode.attachChild(buffs);
-    guiNode.attachChild(playerBullets);
-    guiNode.attachChild(enemies);
-    guiNode.attachChild(enemyBullets);
-    guiNode.attachChild(particles);
+    guiNode.attachChild(Scene.BUFFS);
+    guiNode.attachChild(Scene.PLAYER_BULLETS);
+    guiNode.attachChild(Scene.ENEMIES);
+    guiNode.attachChild(Scene.ENEMY_BULLETS);
+    guiNode.attachChild(Scene.PARTICLES);
 
     guiNode.attachChild(player.spatial());
     guiNode.attachChild(hud.spatial());
@@ -80,32 +70,41 @@ public final class LevelContext implements GameContext {
 
   @Override
   public void disable() {
-    buffs.removeFromParent();
-    playerBullets.removeFromParent();
-    enemies.removeFromParent();
-    enemyBullets.removeFromParent();
-    particles.removeFromParent();
+    Scene.BUFFS.removeFromParent();
+    Scene.PLAYER_BULLETS.removeFromParent();
+    Scene.ENEMIES.removeFromParent();
+    Scene.ENEMY_BULLETS.removeFromParent();
+    Scene.PARTICLES.removeFromParent();
+
+    resetPlayer();
+    hud.spatial().removeFromParent();
+  }
+
+  private void resetPlayer() {
+    var behaviour = playerBehaviour();
+    behaviour.onInput(Input.UP, false);
+    behaviour.onInput(Input.DOWN, false);
+    behaviour.onInput(Input.SHOOT, false);
 
     player.spatial().removeFromParent();
-    hud.spatial().removeFromParent();
   }
 
   @Override
   public void onInput(Input input, boolean isPressed) {
-    var behaviour = (PlayerBehaviour) player.spatial().getControl(SpaceshipControl.class)
-        .getBehaviour();
+    var behaviour = playerBehaviour();
     behaviour.onInput(input, isPressed);
   }
 
   public void reset() {
+    resetPlayer();
     player = player();
     level = 1;
 
-    enemies.getChildren().forEach(Spatial::removeFromParent);
-    enemyBullets.getChildren().forEach(Spatial::removeFromParent);
-    playerBullets.getChildren().forEach(Spatial::removeFromParent);
-    buffs.getChildren().forEach(Spatial::removeFromParent);
-    particles.getChildren().forEach(Spatial::removeFromParent);
+    Scene.ENEMIES.getChildren().forEach(Spatial::removeFromParent);
+    Scene.ENEMY_BULLETS.getChildren().forEach(Spatial::removeFromParent);
+    Scene.PLAYER_BULLETS.getChildren().forEach(Spatial::removeFromParent);
+    Scene.BUFFS.getChildren().forEach(Spatial::removeFromParent);
+    Scene.PARTICLES.getChildren().forEach(Spatial::removeFromParent);
   }
 
   private Spaceship player() {
@@ -120,18 +119,33 @@ public final class LevelContext implements GameContext {
 
 
   private Void spawnBoss() {
-    if (!enemies.getChildren().isEmpty()) {
+    if (!Scene.ENEMIES.getChildren().isEmpty()) {
       // Let the player kill the rest of the enemies before spawning the boss
       return null;
     }
-    SoundUtil.music("boss1");
+    var boss = selectBoss(level);
+    SoundUtil.music(boss.spaceship().name());
+
     // Bosses are never in cooldown
-    addEnemy(createEnemy(BOSS_1, 0).get());
+    addEnemy(createEnemy(boss, 0).get());
     return null;
   }
 
+  private static EnemyDef selectBoss(int level) {
+    return switch (level) {
+      case 1 -> EnemySpawner.BOSS_1;
+      case 2 -> EnemySpawner.BOSS_2;
+      case 3 -> EnemySpawner.BOSS_3;
+      default -> RandomUtil.formallyDistributed(List.of(
+          EnemySpawner.BOSS_1,
+          EnemySpawner.BOSS_2,
+          EnemySpawner.BOSS_3
+      ));
+    };
+  }
+
   private int enemyPoints() {
-    return enemies.getChildren()
+    return Scene.ENEMIES.getChildren()
         .stream()
         .mapToInt(x -> x.getUserData(UserConstants.POINTS))
         .sum();
@@ -162,11 +176,15 @@ public final class LevelContext implements GameContext {
   }
 
   private Optional<Spaceship> createEnemy(EnemyDef def, float tpf) {
-    return EnemySpawner.createEnemy(enemies, def, tpf);
+    return EnemySpawner.createEnemy(Scene.ENEMIES, def, tpf);
   }
 
   private void addEnemy(Spaceship spaceship) {
-    enemies.attachChild(spaceship.spatial());
+    Scene.ENEMIES.attachChild(spaceship.spatial());
+  }
+
+  private PlayerBehaviour playerBehaviour() {
+    return (PlayerBehaviour) player.spatial().getControl(SpaceshipControl.class).getBehaviour();
   }
 
   public void bossKilled() {

@@ -8,15 +8,12 @@ import static com.dam.util.RandomUtil.RANDOM;
 import static com.dam.util.RandomUtil.weighted;
 
 import com.dam.demo.controls.BonusControl;
-import com.dam.demo.game.Contexts;
-import com.dam.demo.game.LevelContext;
+import com.dam.demo.game.Scene;
 import com.dam.demo.model.attack.Damage;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.AssetUtil;
-import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.MathUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
@@ -34,17 +31,16 @@ public enum UpgradeUtil {
   public static final ColorRGBA COLOR_ATTACK_SPEED = ColorRGBA.Green;
   public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.LightGray;
 
-  public static String toString(List<Upgrade> upgrades) {
-    return JsonUtil.write(upgrades);
+  public static ColorRGBA getUpgradeTypeColor(UpgradeType type) {
+    return switch (type) {
+      case HEALTH -> ColorRGBA.White; // Should not happen
+      case ATTACK_DAMAGE -> COLOR_ATTACK_DAMAGE;
+      case ATTACK_SPEED -> COLOR_ATTACK_SPEED;
+      case SHOT_SPEED -> COLOR_SHOT_SPEED;
+      case MOVEMENT_SPEED -> COLOR_SPEED;
+    };
   }
 
-  public static List<Upgrade> parse(String value) {
-    if (value == null) {
-      return List.of();
-    }
-
-    return JsonUtil.read(value, new TypeReference<>() {});
-  }
   public static void spawnBonus(Vector3f location) {
     if (RANDOM.nextInt(4) != 0) {
       return;
@@ -60,7 +56,7 @@ public enum UpgradeUtil {
         option(1, bonus("buffShot", location, buff(new Upgrade(100, UpgradeType.SHOT_SPEED))))
     );
 
-    Contexts.contextByClass(LevelContext.class).buffs.attachChild(buff);
+    Scene.BUFFS.attachChild(buff);
   }
 
   private static Supplier<Spatial> bonus(String name, Vector3f location, Consumer<Spaceship> f) {
@@ -74,15 +70,8 @@ public enum UpgradeUtil {
   }
 
   private static Consumer<Spaceship> buff(Upgrade upgrade) {
-    var color = switch (upgrade.type()) {
-      case HEALTH -> ColorRGBA.White; // Should not happen
-      case ATTACK_DAMAGE -> COLOR_ATTACK_DAMAGE;
-      case ATTACK_SPEED -> COLOR_ATTACK_SPEED;
-      case SHOT_SPEED -> COLOR_SHOT_SPEED;
-      case MOVEMENT_SPEED -> COLOR_SPEED;
-    };
 
-    return x -> x.addBuff(new Buff(upgrade, Duration.ofSeconds(10), color));
+    return x -> x.addBuff(new Buff(upgrade, Duration.ofSeconds(10)));
   }
 
   public static Shot upgradeShot(Shot shot, List<Upgrade> upgrades) {

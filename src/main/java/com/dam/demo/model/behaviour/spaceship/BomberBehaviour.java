@@ -13,8 +13,9 @@ import com.jme3.math.FastMath;
 import com.jme3.scene.Spatial;
 import java.time.Duration;
 
-public class BomberBehaviour extends SpaceshipBehaviourBase {
+public class BomberBehaviour implements SpaceshipBehaviour {
 
+  private final Spaceship spaceship;
   private final CollisionBehaviour collision;
 
   private float widthDirection;
@@ -22,7 +23,7 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
   private float rotation;
 
   public BomberBehaviour(Spaceship spaceship) {
-    super(spaceship);
+    this.spaceship = spaceship;
     var attack = JsonUtil.read(spaceship.attack(), BomberAttack.class);
     this.collision = new CollisionBehaviour(
         attack.collision(),
@@ -67,7 +68,8 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void onCollision(Spatial spatial, float tpf) {
-    if (ShipType.PLAYER.is(spatial) && collision.tryAttack(spatial, improvements(), tpf)) {
+    if (ShipType.PLAYER.is(spatial)
+        && collision.tryAttack(spatial, spaceship.improvements(), tpf)) {
         revertDirection();
         return;
     }
@@ -86,6 +88,11 @@ public class BomberBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     collision.tick(tpf);
+  }
+
+  @Override
+  public Spaceship spaceship() {
+    return spaceship;
   }
 
   private static float randomDirection() {

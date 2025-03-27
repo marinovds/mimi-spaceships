@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.List;
 
 public enum JsonUtil {
   ;
@@ -33,5 +34,13 @@ public enum JsonUtil {
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Cannot read value", e);
     }
+  }
+
+  public static <T> List<T> readList(String value) {
+    if (value == null) {
+      return List.of();
+    }
+
+    return read(value, new TypeReference<>() {});
   }
 }

@@ -7,6 +7,7 @@ import static com.dam.demo.enemies.Tag.EnemyType.CHASER;
 import static com.dam.demo.enemies.Tag.EnemyType.CRUISER;
 import static com.dam.demo.enemies.Tag.ShipType.ENEMY;
 import static com.dam.demo.model.attack.Damage.bullet;
+import static com.dam.demo.model.attack.Damage.rocket;
 
 import com.dam.demo.enemies.Tag.ArmorType;
 import com.dam.demo.enemies.Tag.ShipType;
@@ -57,7 +58,7 @@ public enum SpaceshipDefinitions {
       new SpaceshipDefinition(
           "cruiser",
           Set.of(CRUISER, ENEMY),
-          new CruiserAttack(new Shot(bullet(10), 1000, Duration.ofMillis(600)), 300),
+          new CruiserAttack(new Shot(rocket(10), 1000, Duration.ofMillis(600)), 300),
           400,
           20,
           10,

@@ -3,8 +3,7 @@ package com.dam.demo.controls;
 import static com.dam.util.RandomUtil.RANDOM;
 
 import com.dam.demo.enemies.Tag.ProjectileType;
-import com.dam.demo.game.Contexts;
-import com.dam.demo.game.LevelContext;
+import com.dam.demo.game.Scene;
 import com.dam.demo.util.AssetUtil;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -26,7 +25,7 @@ public enum ParticleManager {
       particle.setLocalTranslation(position);
 
       particle.addControl(new ParticleControl(velocity, color));
-      Contexts.contextByClass(LevelContext.class).particles.attachChild(particle);
+      Scene.PARTICLES.attachChild(particle);
     }
   }
 

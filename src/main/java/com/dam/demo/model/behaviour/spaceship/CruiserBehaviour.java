@@ -9,16 +9,16 @@ import com.dam.demo.util.JsonUtil;
 import com.dam.util.RandomUtil;
 import com.jme3.scene.Spatial;
 
-public class CruiserBehaviour extends SpaceshipBehaviourBase {
+public class CruiserBehaviour implements SpaceshipBehaviour {
 
+  private final Spaceship spaceship;
   private final CruiserAttack attack;
   private final ShotBehaviour behaviour;
 
   private int direction;
 
   public CruiserBehaviour(Spaceship spaceship) {
-    super(spaceship);
-
+    this.spaceship = spaceship;
     this.attack = JsonUtil.read(spaceship.attack(), CruiserAttack.class);
     this.behaviour = new ShotBehaviour(spaceship, attack.shot());
     this.direction = 1;
@@ -50,10 +50,15 @@ public class CruiserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
-      behaviour.tryAttack(improvements(), tpf);
+      behaviour.tryAttack(spaceship.improvements(), tpf);
       return;
     }
     behaviour.tick(tpf);
+  }
+
+  @Override
+  public Spaceship spaceship() {
+    return spaceship;
   }
 
   public record CruiserAttack(Shot shot, int random) implements SpaceshipAttack{}

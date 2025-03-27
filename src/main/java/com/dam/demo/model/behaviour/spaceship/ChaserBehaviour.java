@@ -16,8 +16,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.time.Duration;
 
-public class ChaserBehaviour extends SpaceshipBehaviourBase {
+public class ChaserBehaviour implements SpaceshipBehaviour {
 
+  private final Spaceship spaceship;
   private final int baseSpeed;
   private final float speedMult;
   private final CollisionBehaviour collision;
@@ -26,7 +27,7 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
   private float rotation;
 
   public ChaserBehaviour(Spaceship spaceship) {
-    super(spaceship);
+    this.spaceship = spaceship;
     var attack = JsonUtil.read(spaceship.attack(), ChaserAttack.class);
     this.baseSpeed = spaceship.speed();
     this.speedMult = attack.speedMultiplier();
@@ -65,7 +66,7 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void onCollision(Spatial spatial, float tpf) {
     if (ShipType.PLAYER.is(spatial)) {
-      collision.tryAttack(spatial, improvements(), tpf);
+      collision.tryAttack(spatial, spaceship.improvements(), tpf);
       spaceship.spatial().removeFromParent();
       ParticleManager.explosion(spaceship.location(), 10);
       return;
@@ -84,6 +85,11 @@ public class ChaserBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     collision.tick(tpf);
+  }
+
+  @Override
+  public Spaceship spaceship() {
+    return spaceship;
   }
 
   public record ChaserAttack(int collision, float speedMultiplier) implements SpaceshipAttack {

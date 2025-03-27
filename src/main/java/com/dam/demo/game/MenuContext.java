@@ -6,6 +6,7 @@ import static com.dam.demo.util.AssetUtil.text;
 
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.util.LangUtil;
+import com.dam.demo.util.SoundUtil;
 import com.jme3.app.SimpleApplication;
 import com.jme3.font.BitmapText;
 import com.jme3.scene.Node;
@@ -100,6 +101,7 @@ public final class MenuContext implements GameContext {
   }
 
   private int moveIndex(int amount) {
+    SoundUtil.play("menuMove");
     var options = availableOptions();
     return LangUtil.clamp(index + amount, 0, options.size() - 1);
   }

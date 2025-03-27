@@ -29,7 +29,6 @@ public class CollisionBehaviour {
 
   public boolean tryAttack(Spatial target, List<Upgrade> buffs, float tpf) {
     if (attackCooldown.isPositive()) {
-      tick(tpf);
       return false;
     }
 

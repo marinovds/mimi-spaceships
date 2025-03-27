@@ -1,7 +1,5 @@
 package com.dam.demo.model;
 
-import java.time.Duration;
-
 public enum UserConstants {
   ;
 
@@ -12,7 +10,7 @@ public enum UserConstants {
   public static final String TAGS = "tags";
   public static final String ATTACK = "attack";
   public static final String UPGRADE = "upgrade";
+  public static final String BUFF = "buff";
   public static final String LAST_HIT = "lastHit";
-  public static final Duration INVINCIBILITY = Duration.ofMillis(500);
 
 }

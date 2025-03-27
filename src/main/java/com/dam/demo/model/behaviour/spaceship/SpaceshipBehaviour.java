@@ -1,9 +1,8 @@
 package com.dam.demo.model.behaviour.spaceship;
 
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.upgrade.Upgrade;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.jme3.scene.Spatial;
-import java.util.List;
 
 /**
  * Interface that specifies how a spaceship behaves.
@@ -13,7 +12,7 @@ public interface SpaceshipBehaviour {
   /**
    * Move the spaceship.
    *
-   * @param tpf       the time per frame in seconds
+   * @param tpf       the time per frame in seconds.
    */
   void move(float tpf);
 
@@ -30,21 +29,21 @@ public interface SpaceshipBehaviour {
    * The spaceship collided while moving.
    *
    * @param spatial the object that the spaceship collided with.
-   * @param tpf the time per frame in seconds
+   * @param tpf the time per frame in seconds.
    */
   void onCollision(Spatial spatial, float tpf);
 
   /**
    * The attack of the spaceship.
    *
-   * @param tpf the time per frame
+   * @param tpf the time per frame.
    */
   void attack(float tpf);
 
   /**
-   * Sets the currently active buffs or empty list if none
+   * The underlying spaceship.
    *
-   * @param buffs the currently active buffs.
+   * @return The underlying spaceship.
    */
-  void currentlyActiveBuffs(List<Upgrade> buffs);
+  Spaceship spaceship();
 }

@@ -7,6 +7,7 @@ import com.dam.demo.enemies.Tag.ProjectileType;
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
+import com.dam.demo.game.Scene;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.upgrade.Upgrade;
@@ -47,8 +48,7 @@ public class ShotBehaviour implements AttackBehaviour {
     var shot = upgradeShot(this.shot, buffs);
     cooldown = shot.cooldown();
     var proj = shoot(spaceship, aim, shot);
-    var level = Contexts.contextByClass(LevelContext.class);
-    var node = spaceship.is(ShipType.PLAYER) ? level.playerBullets : level.enemyBullets;
+    var node = spaceship.is(ShipType.PLAYER) ? Scene.PLAYER_BULLETS : Scene.ENEMY_BULLETS;
     node.attachChild(proj);
     return true;
   }
@@ -116,15 +116,15 @@ public class ShotBehaviour implements AttackBehaviour {
     var level = Contexts.contextByClass(LevelContext.class);
     return Stream.concat(
         Stream.of(level.player.spatial()),
-        rockets(level.playerBullets)
+        rockets(Scene.PLAYER_BULLETS)
     );
   }
 
   private static Stream<Spatial> playerTargets() {
     var level = Contexts.contextByClass(LevelContext.class);
     return Stream.concat(
-        level.enemies.getChildren().stream(),
-        rockets(level.enemyBullets)
+        Scene.ENEMIES.getChildren().stream(),
+        rockets(Scene.ENEMY_BULLETS)
     );
   }
 

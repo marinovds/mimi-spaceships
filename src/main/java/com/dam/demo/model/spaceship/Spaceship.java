@@ -1,24 +1,25 @@
 package com.dam.demo.model.spaceship;
 
 import static com.dam.demo.model.UserConstants.ATTACK;
+import static com.dam.demo.model.UserConstants.BUFF;
 import static com.dam.demo.model.UserConstants.COINS;
 import static com.dam.demo.model.UserConstants.HEALTH;
 import static com.dam.demo.model.UserConstants.POINTS;
 import static com.dam.demo.model.UserConstants.TAGS;
 import static com.dam.demo.model.UserConstants.UPGRADE;
 
-import com.dam.demo.controls.SpaceshipControl;
 import com.dam.demo.enemies.Tag;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
-import com.dam.demo.model.upgrade.UpgradeUtil;
+import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.LangUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public record Spaceship(
     Spatial spatial,
@@ -55,10 +56,6 @@ public record Spaceship(
     return spatial.getWorldTranslation();
   }
 
-  public List<Upgrade> upgrades() {
-    return UpgradeUtil.parse(spatial.getUserData(UPGRADE));
-  }
-
   public Spaceship addCoins(int amount) {
     var coins = coins() + amount;
     spatial.setUserData(COINS, coins);
@@ -80,22 +77,43 @@ public record Spaceship(
     return this;
   }
 
-  public Spaceship addBuff(Buff buff) {
-    spatial.getControl(SpaceshipControl.class).addBuff(buff);
+  public List<Upgrade> upgrades() {
+    return JsonUtil.readList(spatial.getUserData(UPGRADE));
+  }
+
+  public Spaceship addUpgrade(Upgrade upgrade) {
+    var updated = LangUtil.addToList(upgrades(), upgrade);
+    spatial.setUserData(UPGRADE, JsonUtil.write(updated));
 
     return this;
+  }
+
+  public List<Buff> buffs() {
+    return JsonUtil.readList(spatial.getUserData(BUFF));
+  }
+
+  public Spaceship addBuff(Buff buff) {
+    var updated = LangUtil.replace(buffs(), buff, x -> x.upgrade().type() == buff.upgrade().type());
+
+    return setBuffs(updated);
+  }
+
+  public Spaceship setBuffs(List<Buff> buffs) {
+    spatial.setUserData(BUFF, JsonUtil.write(buffs));
+
+    return this;
+  }
+
+  public List<Upgrade> improvements() {
+    return Stream.concat(
+            buffs().stream().map(Buff::upgrade),
+            upgrades().stream()
+        )
+        .toList();
   }
 
   public boolean is(Tag tag) {
     return tags.contains(tag);
   }
 
-  public SpaceshipControl control() {
-    return spatial.getControl(SpaceshipControl.class);
-  }
-
-  public void addUpgrade(Upgrade upgrade) {
-    var updated = UpgradeUtil.toString(LangUtil.addToList(upgrades(), upgrade));
-    spatial.setUserData(UPGRADE, updated);
-  }
 }

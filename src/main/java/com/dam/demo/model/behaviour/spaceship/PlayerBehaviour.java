@@ -16,8 +16,9 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class PlayerBehaviour extends SpaceshipBehaviourBase {
+public class PlayerBehaviour implements SpaceshipBehaviour {
 
+  private final Spaceship spaceship;
   private final ShotBehaviour behaviour;
   private final Map<Input, Boolean> inputs = new EnumMap<>(Map.of(
       UP, false,
@@ -29,7 +30,7 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
   private boolean bottomReached;
 
   public PlayerBehaviour(Spaceship spaceship) {
-    super(spaceship);
+    this.spaceship = spaceship;
     var attack = JsonUtil.read(spaceship.attack(), PlayerAttack.class);
     this.behaviour = new ShotBehaviour(spaceship, attack.shot());
     this.topReached = false;
@@ -67,10 +68,15 @@ public class PlayerBehaviour extends SpaceshipBehaviourBase {
   @Override
   public void attack(float tpf) {
     Consumer<ShotBehaviour> f = inputs.get(SHOOT)
-        ? x -> x.tryAttack(improvements(), tpf)
+        ? x -> x.tryAttack(spaceship.improvements(), tpf)
         : x -> x.tick(tpf);
 
     f.accept(behaviour);
+  }
+
+  @Override
+  public Spaceship spaceship() {
+    return spaceship;
   }
 
   public void onInput(Input input, boolean isPressed) {

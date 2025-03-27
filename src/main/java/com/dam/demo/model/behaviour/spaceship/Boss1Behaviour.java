@@ -11,20 +11,22 @@ import com.jme3.scene.Spatial;
 import java.time.Duration;
 import java.util.List;
 
-public class Boss1Behaviour extends SpaceshipBehaviourBase {
+public class Boss1Behaviour implements SpaceshipBehaviour {
 
+  private final Spaceship spaceship;
   private final RotaryBehaviour behaviour;
 
   private int direction;
 
   public Boss1Behaviour(Spaceship spaceship) {
-    super(spaceship);
+    this.spaceship = spaceship;
     var attack = JsonUtil.read(spaceship.attack(), Boss1Attack.class);
     var attacks = attack.shots()
         .stream()
         .map(x -> new ShotBehaviour(spaceship, x))
         .toList();
-    this.behaviour = new RotaryBehaviour(attacks, attack.attackDuration(), attack.cooldownDuration());
+    this.behaviour = new RotaryBehaviour(attacks, attack.attackDuration(),
+        attack.cooldownDuration());
 
     this.direction = 1;
   }
@@ -54,7 +56,7 @@ public class Boss1Behaviour extends SpaceshipBehaviourBase {
 
   @Override
   public void attack(float tpf) {
-    behaviour.tryAttack(improvements(), tpf);
+    behaviour.tryAttack(spaceship.improvements(), tpf);
   }
 
   public record Boss1Attack(
@@ -63,5 +65,10 @@ public class Boss1Behaviour extends SpaceshipBehaviourBase {
       Duration cooldownDuration) implements
       SpaceshipAttack {
 
+  }
+
+  @Override
+  public Spaceship spaceship() {
+    return spaceship;
   }
 }
