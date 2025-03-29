@@ -40,6 +40,7 @@ public class ChaserBehaviour implements SpaceshipBehaviour {
 
   @Override
   public void move(float tpf) {
+    collision.tick(tpf);
     var aim = getAim(Contexts.contextByClass(LevelContext.class).player.location(), spaceship.location());
     float actualRotation = angleFromVector(aim.negate());
     if (actualRotation != rotation) {
@@ -66,7 +67,7 @@ public class ChaserBehaviour implements SpaceshipBehaviour {
   @Override
   public void onCollision(Spatial spatial, float tpf) {
     if (ShipType.PLAYER.is(spatial)) {
-      collision.tryAttack(spatial, spaceship.improvements(), tpf);
+      collision.tryAttack(spatial, spaceship.improvements());
       spaceship.spatial().removeFromParent();
       ParticleManager.explosion(spaceship.location(), 10);
       return;
@@ -84,7 +85,7 @@ public class ChaserBehaviour implements SpaceshipBehaviour {
 
   @Override
   public void attack(float tpf) {
-    collision.tick(tpf);
+    // Chasers do not attack
   }
 
   @Override

@@ -1,5 +1,6 @@
 package com.dam.demo.model.behaviour.spaceship;
 
+import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.Shot;
@@ -20,7 +21,7 @@ public class CruiserBehaviour implements SpaceshipBehaviour {
   public CruiserBehaviour(Spaceship spaceship) {
     this.spaceship = spaceship;
     this.attack = JsonUtil.read(spaceship.attack(), CruiserAttack.class);
-    this.behaviour = new ShotBehaviour(spaceship, attack.shot());
+    this.behaviour = new ShotBehaviour(ShipType.ENEMY, spaceship::location, attack.shot());
     this.direction = 1;
   }
 
@@ -49,11 +50,10 @@ public class CruiserBehaviour implements SpaceshipBehaviour {
 
   @Override
   public void attack(float tpf) {
-    if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
-      behaviour.tryAttack(spaceship.improvements(), tpf);
-      return;
-    }
     behaviour.tick(tpf);
+    if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
+      behaviour.tryAttack(spaceship.improvements());
+    }
   }
 
   @Override

@@ -38,6 +38,7 @@ public class BomberBehaviour implements SpaceshipBehaviour {
 
   @Override
   public void move(float tpf) {
+    collision.tick(tpf);
     spaceship.spatial().rotate(0, 0, FastMath.INV_PI * rotation * tpf);
     spaceship.spatial().move(
         tpf * spaceship.speed() * widthDirection,
@@ -69,7 +70,7 @@ public class BomberBehaviour implements SpaceshipBehaviour {
   @Override
   public void onCollision(Spatial spatial, float tpf) {
     if (ShipType.PLAYER.is(spatial)
-        && collision.tryAttack(spatial, spaceship.improvements(), tpf)) {
+        && collision.tryAttack(spatial, spaceship.improvements())) {
         revertDirection();
         return;
     }
@@ -87,7 +88,7 @@ public class BomberBehaviour implements SpaceshipBehaviour {
 
   @Override
   public void attack(float tpf) {
-    collision.tick(tpf);
+    // Bombers do not attack
   }
 
   @Override

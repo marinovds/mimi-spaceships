@@ -1,7 +1,6 @@
 package com.dam.demo.model.behaviour.attack;
 
 import static com.dam.demo.model.upgrade.UpgradeUtil.upgradeShot;
-import static com.dam.demo.util.MathUtil.getAimDirection;
 
 import com.dam.demo.enemies.Tag.ProjectileType;
 import com.dam.demo.enemies.Tag.ShipType;
@@ -9,7 +8,6 @@ import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
 import com.dam.demo.game.Scene;
 import com.dam.demo.model.attack.Shot;
-import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.MathUtil;
@@ -26,29 +24,31 @@ import java.util.stream.Stream;
 
 public class ShotBehaviour implements AttackBehaviour {
 
-  private final Spaceship spaceship;
+  private final ShipType shooter;
+  private final Supplier<Vector3f> location;
   private final Vector3f aim;
 
   private final Shot shot;
   private Duration cooldown;
 
-  public ShotBehaviour(Spaceship spaceship, Shot shot) {
-    this.spaceship = spaceship;
+  public ShotBehaviour(ShipType shooter, Supplier<Vector3f> location, Shot shot) {
+    this.shooter = shooter;
+    this.location = location;
     this.shot = shot;
-    this.aim = getAim(spaceship);
+
+    this.aim = getAim(shooter);
     this.cooldown = Duration.ZERO;
   }
 
   @Override
-  public boolean tryAttack(List<Upgrade> buffs, float tpf) {
+  public boolean tryAttack(List<Upgrade> buffs) {
     if (cooldown.isPositive()) {
-      tick(tpf);
       return false;
     }
     var shot = upgradeShot(this.shot, buffs);
     cooldown = shot.cooldown();
-    var proj = shoot(spaceship, aim, shot);
-    var node = spaceship.is(ShipType.PLAYER) ? Scene.PLAYER_BULLETS : Scene.ENEMY_BULLETS;
+    var proj = shoot(location.get(), aim, shot);
+    var node = shooter == ShipType.PLAYER ? Scene.PLAYER_BULLETS : Scene.ENEMY_BULLETS;
     node.attachChild(proj);
     return true;
   }
@@ -58,30 +58,22 @@ public class ShotBehaviour implements AttackBehaviour {
     cooldown = MathUtil.subtractDuration(cooldown, tpf);
   }
 
-  private static Spatial shoot(Spaceship spaceship, Vector3f aim, Shot shot) {
+  private Spatial shoot(Vector3f location, Vector3f aim, Shot shot) {
     var spatial = switch (shot.damage().type()) {
-      case BULLET -> bullet(spaceship);
-      case ROCKET -> rocket(spaceship);
+      case BULLET -> bullet(shooter);
+      case ROCKET -> rocket(shooter);
       case COLLISION -> throw new UnsupportedOperationException();
     };
 
-    spatial.addControl(new ShotProjectileControl(aim, shot, targets(spaceship)));
-    spatial.setLocalTranslation(translation(spaceship));
+    spatial.addControl(new ShotProjectileControl(aim, shot, targets(shooter)));
+    spatial.setLocalTranslation(location);
 
     return spatial;
   }
 
-  private static Vector3f translation(Spaceship spaceship) {
-    var offset = new Vector3f(spaceship.dimensions().height() / 2, 0, 0);
-    if (spaceship.is(ShipType.PLAYER)) {
-      return spaceship.location().add(offset);
-    }
-    return spaceship.location().add(offset.negate());
-  }
-
-  private static Spatial rocket(Spaceship spaceship) {
+  private static Spatial rocket(ShipType shooter) {
     var rocket = AssetUtil.projectile("rocket", ProjectileType.ROCKET);
-    if (spaceship.is(ShipType.PLAYER)) {
+    if (shooter == ShipType.PLAYER) {
       return rocket;
     }
 
@@ -93,9 +85,9 @@ public class ShotBehaviour implements AttackBehaviour {
     return rocket;
   }
 
-  private static Spatial bullet(Spaceship spaceship) {
+  private static Spatial bullet(ShipType shooter) {
     var bullet = AssetUtil.projectile("bullet", ProjectileType.BULLET);
-    if (spaceship.is(ShipType.PLAYER)) {
+    if (shooter == ShipType.PLAYER) {
       SoundUtil.play("shot");
 
       return bullet;
@@ -108,8 +100,8 @@ public class ShotBehaviour implements AttackBehaviour {
     return bullet;
   }
 
-  private static Supplier<List<Spatial>> targets(Spaceship spaceship) {
-    return () -> (spaceship.is(ShipType.PLAYER) ? playerTargets() : enemyTargets()).toList();
+  private static Supplier<List<Spatial>> targets(ShipType shooter) {
+    return () -> (shooter == ShipType.PLAYER ? playerTargets() : enemyTargets()).toList();
   }
 
   private static Stream<Spatial> enemyTargets() {
@@ -121,7 +113,6 @@ public class ShotBehaviour implements AttackBehaviour {
   }
 
   private static Stream<Spatial> playerTargets() {
-    var level = Contexts.contextByClass(LevelContext.class);
     return Stream.concat(
         Scene.ENEMIES.getChildren().stream(),
         rockets(Scene.ENEMY_BULLETS)
@@ -134,10 +125,12 @@ public class ShotBehaviour implements AttackBehaviour {
         .filter(x -> x.getName().equals("rocket"));
   }
 
-  private static Vector3f getAim(Spaceship spaceship) {
-    if (spaceship.is(ShipType.ENEMY) || spaceship.is(ShipType.BOSS)) {
-      return getAimDirection(spaceship.location()).negate();
+  private static Vector3f getAim(ShipType shooter) {
+    if (shooter == ShipType.PLAYER) {
+      return new Vector3f(1, 0, 0);
     }
-    return getAimDirection(spaceship.location());
+
+    return new Vector3f(-1, 0, 0);
   }
+
 }

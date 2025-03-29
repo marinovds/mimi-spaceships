@@ -19,7 +19,6 @@ import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour.ChaserAttack;
 import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour.CruiserAttack;
 import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour.PlayerAttack;
 import java.time.Duration;
-import java.util.List;
 import java.util.Set;
 
 public enum SpaceshipDefinitions {
@@ -29,12 +28,9 @@ public enum SpaceshipDefinitions {
       "boss1",
       Set.of(SpatialType.SPACESHIP, ShipType.BOSS, ShipType.ENEMY, ArmorType.HEAVY),
       new Boss1Attack(
-          List.of(
-              new Shot(bullet(20), 600, Duration.ofMillis(300)),
-              new Shot(bullet(30), 900, Duration.ofMillis(500)),
-              new Shot(bullet(50), 1500, Duration.ofMillis(700)),
-              new Shot(bullet(70), 2200, Duration.ofMillis(900))
-          ),
+          new Shot(bullet(50), 2200, Duration.ofMillis(700)),
+          new Shot(rocket(30), 600, Duration.ofMillis(400)),
+          new Shot(bullet(10), 900, Duration.ofMillis(500)),
           Duration.ofSeconds(3),
           Duration.ofMillis(500)
       ),
@@ -58,7 +54,7 @@ public enum SpaceshipDefinitions {
       new SpaceshipDefinition(
           "cruiser",
           Set.of(CRUISER, ENEMY),
-          new CruiserAttack(new Shot(rocket(10), 1000, Duration.ofMillis(600)), 300),
+          new CruiserAttack(new Shot(bullet(10), 1000, Duration.ofMillis(600)), 300),
           400,
           20,
           10,

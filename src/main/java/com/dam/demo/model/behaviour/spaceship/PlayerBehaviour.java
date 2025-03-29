@@ -4,6 +4,7 @@ import static com.dam.demo.listeners.KeyboardListener.Input.DOWN;
 import static com.dam.demo.listeners.KeyboardListener.Input.SHOOT;
 import static com.dam.demo.listeners.KeyboardListener.Input.UP;
 
+import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.attack.Shot;
@@ -14,7 +15,6 @@ import com.dam.demo.util.JsonUtil;
 import com.jme3.scene.Spatial;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class PlayerBehaviour implements SpaceshipBehaviour {
 
@@ -32,7 +32,7 @@ public class PlayerBehaviour implements SpaceshipBehaviour {
   public PlayerBehaviour(Spaceship spaceship) {
     this.spaceship = spaceship;
     var attack = JsonUtil.read(spaceship.attack(), PlayerAttack.class);
-    this.behaviour = new ShotBehaviour(spaceship, attack.shot());
+    this.behaviour = new ShotBehaviour(ShipType.PLAYER, spaceship::location, attack.shot());
     this.topReached = false;
     this.bottomReached = false;
   }
@@ -67,11 +67,10 @@ public class PlayerBehaviour implements SpaceshipBehaviour {
 
   @Override
   public void attack(float tpf) {
-    Consumer<ShotBehaviour> f = inputs.get(SHOOT)
-        ? x -> x.tryAttack(spaceship.improvements(), tpf)
-        : x -> x.tick(tpf);
-
-    f.accept(behaviour);
+    behaviour.tick(tpf);
+    if (inputs.get(SHOOT)) {
+      behaviour.tryAttack(spaceship.improvements());
+    }
   }
 
   @Override

@@ -27,7 +27,7 @@ public class CollisionBehaviour {
     this.friendlyCooldown = friendlyCollisionDuration;
   }
 
-  public boolean tryAttack(Spatial target, List<Upgrade> buffs, float tpf) {
+  public boolean tryAttack(Spatial target, List<Upgrade> buffs) {
     if (attackCooldown.isPositive()) {
       return false;
     }

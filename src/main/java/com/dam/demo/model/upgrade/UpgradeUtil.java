@@ -2,7 +2,6 @@ package com.dam.demo.model.upgrade;
 
 import static com.dam.demo.util.MathUtil.apply;
 import static com.dam.demo.util.MathUtil.decreaseDuration;
-import static com.dam.demo.util.MathUtil.getAimDirection;
 import static com.dam.util.RandomUtil.Option.option;
 import static com.dam.util.RandomUtil.RANDOM;
 import static com.dam.util.RandomUtil.weighted;
@@ -63,7 +62,7 @@ public enum UpgradeUtil {
     return () -> {
       var result = AssetUtil.bonus(name);
       result.setLocalTranslation(location);
-      result.addControl(new BonusControl(getAimDirection(location).negate(), f));
+      result.addControl(new BonusControl(new Vector3f(-1, 0, 0), f));
 
       return result;
     };

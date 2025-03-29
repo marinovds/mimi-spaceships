@@ -48,10 +48,6 @@ public enum MathUtil {
     return result.isNegative() ? Duration.ZERO : result;
   }
 
-  public static Vector3f getAimDirection(Vector3f location) {
-    return new Vector3f(location.x, 0, 0).normalizeLocal();
-  }
-
   public static boolean isDead(Spaceship spaceship) {
     return spaceship.health() <= 0;
   }

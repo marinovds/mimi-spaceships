@@ -15,6 +15,7 @@ import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.LangUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.util.List;
@@ -78,7 +79,12 @@ public record Spaceship(
   }
 
   public List<Upgrade> upgrades() {
-    return JsonUtil.readList(spatial.getUserData(UPGRADE));
+    var buffs = spatial.<String>getUserData(UPGRADE);
+    if (buffs == null) {
+      return List.of();
+    }
+
+    return JsonUtil.read(buffs, new TypeReference<>() {});
   }
 
   public Spaceship addUpgrade(Upgrade upgrade) {
@@ -89,7 +95,12 @@ public record Spaceship(
   }
 
   public List<Buff> buffs() {
-    return JsonUtil.readList(spatial.getUserData(BUFF));
+    var buffs = spatial.<String>getUserData(BUFF);
+    if (buffs == null) {
+      return List.of();
+    }
+
+    return JsonUtil.read(buffs, new TypeReference<>() {});
   }
 
   public Spaceship addBuff(Buff buff) {
