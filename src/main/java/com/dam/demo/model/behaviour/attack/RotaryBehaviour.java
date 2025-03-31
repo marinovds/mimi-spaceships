@@ -23,7 +23,7 @@ public class RotaryBehaviour implements AttackBehaviour {
     this.attackDuration = attackDuration;
     this.cooldownDuration = cooldownDuration;
 
-    this.status = RotaryStatus.ATTACKING;
+    this.status = RotaryStatus.COOLDOWN;
     this.duration = attackDuration;
     this.attackIndex = 0;
   }

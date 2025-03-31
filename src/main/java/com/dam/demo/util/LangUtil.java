@@ -22,7 +22,7 @@ public enum LangUtil {
   }
 
   public static <T> List<T> replace(List<T> list, T entry, Predicate<T> f) {
-    return Stream.concat(list.stream().filter(f), Stream.of(entry)).toList();
+    return Stream.concat(list.stream().filter(f.negate()), Stream.of(entry)).toList();
 
   }
 

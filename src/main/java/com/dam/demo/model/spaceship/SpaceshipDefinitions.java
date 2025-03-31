@@ -28,9 +28,9 @@ public enum SpaceshipDefinitions {
       "boss1",
       Set.of(SpatialType.SPACESHIP, ShipType.BOSS, ShipType.ENEMY, ArmorType.HEAVY),
       new Boss1Attack(
-          new Shot(bullet(50), 2200, Duration.ofMillis(700)),
-          new Shot(rocket(30), 600, Duration.ofMillis(400)),
-          new Shot(bullet(10), 900, Duration.ofMillis(500)),
+          new Shot(bullet(50), 2200, Duration.ofSeconds(1)),
+          new Shot(rocket(20), 600, Duration.ofMillis(850)),
+          new Shot(bullet(5), 900, Duration.ofMillis(500)),
           Duration.ofSeconds(3),
           Duration.ofMillis(500)
       ),

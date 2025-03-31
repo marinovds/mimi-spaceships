@@ -9,6 +9,7 @@ import static com.dam.demo.util.AssetUtil.spaceship;
 import com.dam.demo.controls.SpaceshipControl;
 import com.dam.demo.enemies.EnemyDef;
 import com.dam.demo.enemies.EnemySpawner;
+import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour;
@@ -46,7 +47,7 @@ public final class LevelContext implements GameContext {
   @Override
   public void enable() {
     state = LevelState.ENEMY_SPAWNING;
-    SoundUtil.music("ambient");
+    playMusic();
 
     guiNode.attachChild(Scene.BUFFS);
     guiNode.attachChild(Scene.PLAYER_BULLETS);
@@ -64,7 +65,7 @@ public final class LevelContext implements GameContext {
     var unused = switch (state) {
       case INIT -> throw new IllegalStateException("Level not initialized");
       case ENEMY_SPAWNING -> spawnEnemies(tpf);
-      case BOSS_SPAWNING -> spawnBoss();
+      case BOSS_SPAWNING -> spawnBoss(tpf);
     };
   }
 
@@ -78,15 +79,6 @@ public final class LevelContext implements GameContext {
 
     resetPlayer();
     hud.spatial().removeFromParent();
-  }
-
-  private void resetPlayer() {
-    var behaviour = playerBehaviour();
-    behaviour.onInput(Input.UP, false);
-    behaviour.onInput(Input.DOWN, false);
-    behaviour.onInput(Input.SHOOT, false);
-
-    player.spatial().removeFromParent();
   }
 
   @Override
@@ -107,56 +99,13 @@ public final class LevelContext implements GameContext {
     Scene.PARTICLES.getChildren().forEach(Spatial::removeFromParent);
   }
 
-  private Spaceship player() {
-    Spaceship result = spaceship(SpaceshipDefinitions.PLAYER_DEF);
-    var dimensions = result.dimensions();
-    var spatial = result.spatial();
-    spatial.setLocalTranslation(dimensions.radius(), screenHeight() / 2f, 0);
-    spatial.addControl(new SpaceshipControl(new PlayerBehaviour(result)));
+  private void resetPlayer() {
+    var behaviour = playerBehaviour();
+    behaviour.onInput(Input.UP, false);
+    behaviour.onInput(Input.DOWN, false);
+    behaviour.onInput(Input.SHOOT, false);
 
-    return result;
-  }
-
-
-  private Void spawnBoss() {
-    if (!Scene.ENEMIES.getChildren().isEmpty()) {
-      // Let the player kill the rest of the enemies before spawning the boss
-      return null;
-    }
-    var boss = selectBoss(level);
-    SoundUtil.music(boss.spaceship().name());
-
-    // Bosses are never in cooldown
-    addEnemy(createEnemy(boss, 0).get());
-    return null;
-  }
-
-  private static EnemyDef selectBoss(int level) {
-    return switch (level) {
-      case 1 -> EnemySpawner.BOSS_1;
-      case 2 -> EnemySpawner.BOSS_2;
-      case 3 -> EnemySpawner.BOSS_3;
-      default -> RandomUtil.formallyDistributed(List.of(
-          EnemySpawner.BOSS_1,
-          EnemySpawner.BOSS_2,
-          EnemySpawner.BOSS_3
-      ));
-    };
-  }
-
-  private int enemyPoints() {
-    return Scene.ENEMIES.getChildren()
-        .stream()
-        .mapToInt(x -> x.getUserData(UserConstants.POINTS))
-        .sum();
-  }
-
-  private static int getLevelScore(int level) {
-    int result = BASE_SCORE;
-    for (int i = 1; i < level; i++) {
-      result = 2 * result + (result / 2);
-    }
-    return result;
+    player.spatial().removeFromParent();
   }
 
   private Void spawnEnemies(float tpf) {
@@ -165,27 +114,24 @@ public final class LevelContext implements GameContext {
       return null;
     }
     Stream.of(
-            createEnemy(CRUISER_DEF, tpf),
-            createEnemy(BOMBER_DEF, tpf),
-            level > 1 ? createEnemy(CHASER_DEF, tpf) : Optional.<Spaceship>empty()
+            forLevel(1, CRUISER_DEF, tpf),
+            forLevel(2, BOMBER_DEF, tpf),
+            forLevel(3, CHASER_DEF, tpf)
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
-        .forEach(this::addEnemy);
+        .forEach(x -> Scene.ENEMIES.attachChild(x.spatial()));
     return null;
   }
 
-  private Optional<Spaceship> createEnemy(EnemyDef def, float tpf) {
-    return EnemySpawner.createEnemy(Scene.ENEMIES, def, tpf);
+  private static Optional<Spaceship> forLevel(int minLevel, EnemyDef enemy, float tpf) {
+    if (level < minLevel) {
+      // level criteria not met
+      return Optional.empty();
+    }
+    return EnemySpawner.createEnemy(Scene.ENEMIES, enemy, tpf);
   }
 
-  private void addEnemy(Spaceship spaceship) {
-    Scene.ENEMIES.attachChild(spaceship.spatial());
-  }
-
-  private PlayerBehaviour playerBehaviour() {
-    return (PlayerBehaviour) player.spatial().getControl(SpaceshipControl.class).getBehaviour();
-  }
 
   public void bossKilled() {
     Contexts.switchContext(ShopContext.class);
@@ -205,6 +151,72 @@ public final class LevelContext implements GameContext {
 
   public boolean inGame() {
     return state != LevelState.INIT;
+  }
+
+  private static Spaceship player() {
+    Spaceship result = spaceship(SpaceshipDefinitions.PLAYER_DEF);
+    var dimensions = result.dimensions();
+    var spatial = result.spatial();
+    spatial.setLocalTranslation(dimensions.radius(), screenHeight() / 2f, 0);
+    spatial.addControl(new SpaceshipControl(new PlayerBehaviour(result)));
+
+    return result;
+  }
+
+  private Void spawnBoss(float tpf) {
+    if (!Scene.ENEMIES.getChildren().isEmpty()) {
+      // Let the player kill the rest of the enemies before spawning the boss
+      return null;
+    }
+    var boss = selectBoss(level);
+    SoundUtil.music(boss.spaceship().name());
+
+    // Bosses are never in cooldown
+    var spawned = EnemySpawner.createEnemy(Scene.ENEMIES, boss, tpf);
+    Scene.ENEMIES.attachChild(spawned.get().spatial());
+    return null;
+  }
+
+  private static EnemyDef selectBoss(int level) {
+    return switch (level) {
+      case 1 -> EnemySpawner.BOSS_1;
+      case 2 -> EnemySpawner.BOSS_2;
+      case 3 -> EnemySpawner.BOSS_3;
+      default -> RandomUtil.formallyDistributed(List.of(
+          EnemySpawner.BOSS_1,
+          EnemySpawner.BOSS_2,
+          EnemySpawner.BOSS_3
+      ));
+    };
+  }
+
+  private static int enemyPoints() {
+    return Scene.ENEMIES.getChildren()
+        .stream()
+        .mapToInt(x -> x.getUserData(UserConstants.POINTS))
+        .sum();
+  }
+
+  private static int getLevelScore(int level) {
+    int result = BASE_SCORE;
+    for (int i = 1; i < level; i++) {
+      result = 2 * result + (result / 2);
+    }
+    return result;
+  }
+
+  private PlayerBehaviour playerBehaviour() {
+    return (PlayerBehaviour) player.spatial().getControl(SpaceshipControl.class).getBehaviour();
+  }
+
+  private static void playMusic() {
+    var music = Scene.ENEMIES.getChildren()
+        .stream()
+        .filter(ShipType.BOSS::is)
+        .map(Spatial::getName)
+        .findFirst()
+        .orElse("ambient");
+    SoundUtil.music(music);
   }
 
   public enum LevelState {

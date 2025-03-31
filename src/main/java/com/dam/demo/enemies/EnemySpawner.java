@@ -20,7 +20,6 @@ import com.jme3.scene.Node;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public enum EnemySpawner {
   ;
@@ -77,7 +76,7 @@ public enum EnemySpawner {
     setEnemyCooldown(enemyNode, enemy, definition.spawn().cooldown());
     var spaceship = AssetUtil.spaceship(enemyDef);
     var spatial = spaceship.spatial();
-    spatial.setName(enemy + "_" + UUID.randomUUID());
+    spatial.setName(enemy);
     spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
     spatial.addControl(new SpaceshipControl(definition.behaviour().apply(spaceship)));
 
