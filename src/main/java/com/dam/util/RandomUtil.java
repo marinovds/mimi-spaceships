@@ -11,6 +11,11 @@ public enum RandomUtil {
 
   public static final Random RANDOM = new Random();
 
+
+  public static <T> T formallyDistributed(T... items) {
+    return formallyDistributed(List.of(items));
+  }
+
   public static <T> T formallyDistributed(List<T> items) {
     var pick = RANDOM.nextInt(items.size());
 

@@ -12,14 +12,19 @@ import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour;
 import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.spaceship.SpaceshipDefinitions;
+import com.dam.demo.model.upgrade.Upgrade;
+import com.dam.demo.model.upgrade.UpgradeType;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.LangUtil;
 import com.dam.demo.util.MathUtil;
+import com.dam.util.RandomUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public enum EnemySpawner {
   ;
@@ -44,48 +49,77 @@ public enum EnemySpawner {
 
   public static final EnemyDef CRUISER_DEF = new EnemyDef(
       SpaceshipDefinitions.CRUISER_DEF,
-      new SpawnCriteria(Duration.ofSeconds(1), 150, 5),
+      new SpawnCriteria(Duration.ofSeconds(1), 150, 5, 1),
       CruiserBehaviour::new
   );
 
 
   public static final EnemyDef BOMBER_DEF = new EnemyDef(
       SpaceshipDefinitions.BOMBER_DEF,
-      new SpawnCriteria(Duration.ofSeconds(3), 300, 3),
+      new SpawnCriteria(Duration.ofSeconds(3), 300, 3, 2),
       BomberBehaviour::new
   );
 
   public static final EnemyDef CHASER_DEF = new EnemyDef(
       SpaceshipDefinitions.CHASER_DEF,
-      new SpawnCriteria(Duration.ofSeconds(1), 300, 1),
+      new SpawnCriteria(Duration.ofSeconds(1), 300, 1, 3),
       ChaserBehaviour::new
   );
 
-  public static Optional<Spaceship> createEnemy(Node enemyNode, EnemyDef definition, float tpf) {
-    var enemyDef = definition.spaceship();
+  public static List<Spaceship> spawnRegularEnemies(Node enemies, int level, float tpf) {
+    return Stream.of(
+            CRUISER_DEF,
+            BOMBER_DEF,
+            CHASER_DEF
+        )
+        .filter(x -> x.spawn().level() <= level)
+        .map(x -> createEnemy(enemies, level, x, tpf))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  public static Spaceship spawnBoss(EnemyDef definition, int level) {
+    return spawn(definition, level);
+  }
+
+  private static Optional<Spaceship> createEnemy(Node enemyNode, int level, EnemyDef definition,
+      float tpf) {
     var criteria = definition.spawn();
-    var enemy = enemyDef.name();
+    var enemy = definition.spaceship().name();
     var enemies = getEnemiesOfType(enemyNode, enemy);
-    if (shouldNotSpawn(enemyNode, enemy, criteria, enemies)) {
-      var cooldown = MathUtil.subtractDuration(getEnemyCooldown(enemyNode, enemy), tpf);
+    var enemyCooldown = getEnemyCooldown(enemyNode, enemy);
+    if (shouldNotSpawn(enemyCooldown, criteria, enemies)) {
+      // Tick the cooldown
+      var cooldown = MathUtil.subtractDuration(enemyCooldown, tpf);
       setEnemyCooldown(enemyNode, enemy, cooldown);
 
       return Optional.empty();
     }
 
-    setEnemyCooldown(enemyNode, enemy, definition.spawn().cooldown());
-    var spaceship = AssetUtil.spaceship(enemyDef);
-    var spatial = spaceship.spatial();
-    spatial.setName(enemy);
-    spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
-    spatial.addControl(new SpaceshipControl(definition.behaviour().apply(spaceship)));
+    // Reset the cooldown
+    setEnemyCooldown(enemyNode, enemy, criteria.cooldown());
 
-    return Optional.of(spaceship);
+    return Optional.of(spawn(definition, level));
+  }
+
+  private static List<Upgrade> upgrades(int level, EnemyDef definition) {
+    // TODO: Calculate which is the last level to spawn a unique enemy and do ot hardcode the chaser
+    var lastMobLevel = CHASER_DEF.spawn().level();
+    if (level <= lastMobLevel) {
+      // No upgrades this early on
+      return List.of();
+    }
+
+    return IntStream.range(lastMobLevel + definition.spawn().level(), level)
+        .filter(x -> RANDOM.nextInt(2) == 0)
+        .mapToObj(x -> RandomUtil.formallyDistributed(UpgradeType.values()))
+        .map(x -> new Upgrade(20, x))
+        .toList();
   }
 
   private static boolean shouldNotSpawn(
-      Node enemyNode,
-      String enemy,
+      Duration enemyCooldown,
       SpawnCriteria criteria,
       List<Spaceship> enemies) {
     if (criteria == SpawnCriteria.NONE) {
@@ -93,7 +127,7 @@ public enum EnemySpawner {
     }
 
     return enemies.size() >= criteria.maxNumber()
-        || getEnemyCooldown(enemyNode, enemy).isPositive()
+        || enemyCooldown.isPositive()
         || RANDOM.nextInt(criteria.random()) != 0;
   }
 
@@ -121,5 +155,18 @@ public enum EnemySpawner {
     return new Vector3f(screenWidth() - dims.width() / 2f,
         RANDOM.nextFloat(screenHeight() - dims.height() / 2),
         0);
+  }
+
+  private static Spaceship spawn(EnemyDef def, int level) {
+    var spaceshipDef = def.spaceship();
+    var spaceship = AssetUtil.spaceship(spaceshipDef);
+    var upgrades = upgrades(level, def);
+    upgrades.forEach(spaceship::addUpgrade);
+    var spatial = spaceship.spatial();
+    spatial.setName(spaceshipDef.name());
+    spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
+    spatial.addControl(new SpaceshipControl(def.behaviour().apply(spaceship)));
+
+    return spaceship;
   }
 }

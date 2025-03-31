@@ -1,11 +1,13 @@
 package com.dam.demo.model.behaviour.spaceship;
 
+import static com.dam.util.RandomUtil.formallyDistributed;
+
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.ShotBehaviour;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.util.JsonUtil;
 import com.dam.util.RandomUtil;
 import com.jme3.scene.Spatial;
@@ -22,7 +24,7 @@ public class CruiserBehaviour implements SpaceshipBehaviour {
     this.spaceship = spaceship;
     this.attack = JsonUtil.read(spaceship.attack(), CruiserAttack.class);
     this.behaviour = new ShotBehaviour(ShipType.ENEMY, spaceship::location, attack.shot());
-    this.direction = 1;
+    this.direction = formallyDistributed(1, -1);
   }
 
   @Override

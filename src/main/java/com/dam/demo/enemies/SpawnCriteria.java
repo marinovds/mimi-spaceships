@@ -2,7 +2,11 @@ package com.dam.demo.enemies;
 
 import java.time.Duration;
 
-public record SpawnCriteria(Duration cooldown, int random, int maxNumber) {
+public record SpawnCriteria(
+    Duration cooldown,
+    int random,
+    int maxNumber,
+    int level) {
 
-  public static final SpawnCriteria NONE = new SpawnCriteria(Duration.ZERO, 0, 1);
+  public static final SpawnCriteria NONE = new SpawnCriteria(Duration.ZERO, 0, 1, 0);
 }

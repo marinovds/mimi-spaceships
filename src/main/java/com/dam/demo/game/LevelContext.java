@@ -1,8 +1,5 @@
 package com.dam.demo.game;
 
-import static com.dam.demo.enemies.EnemySpawner.BOMBER_DEF;
-import static com.dam.demo.enemies.EnemySpawner.CHASER_DEF;
-import static com.dam.demo.enemies.EnemySpawner.CRUISER_DEF;
 import static com.dam.demo.util.AssetUtil.screenHeight;
 import static com.dam.demo.util.AssetUtil.spaceship;
 
@@ -20,9 +17,6 @@ import com.dam.util.RandomUtil;
 import com.jme3.app.SimpleApplication;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public final class LevelContext implements GameContext {
 
@@ -32,9 +26,9 @@ public final class LevelContext implements GameContext {
   private final Hud hud;
 
   private LevelState state;
-  public Spaceship player;
 
   // TODO: refactor
+  public Spaceship player;
   public static int level = 1;
 
   LevelContext(SimpleApplication app) {
@@ -65,7 +59,7 @@ public final class LevelContext implements GameContext {
     var unused = switch (state) {
       case INIT -> throw new IllegalStateException("Level not initialized");
       case ENEMY_SPAWNING -> spawnEnemies(tpf);
-      case BOSS_SPAWNING -> spawnBoss(tpf);
+      case BOSS_SPAWNING -> spawnBoss();
     };
   }
 
@@ -113,25 +107,12 @@ public final class LevelContext implements GameContext {
       state = LevelState.BOSS_SPAWNING;
       return null;
     }
-    Stream.of(
-            forLevel(1, CRUISER_DEF, tpf),
-            forLevel(2, BOMBER_DEF, tpf),
-            forLevel(3, CHASER_DEF, tpf)
-        )
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .forEach(x -> Scene.ENEMIES.attachChild(x.spatial()));
+    var enemies = EnemySpawner.spawnRegularEnemies(Scene.ENEMIES, level, tpf);
+    for (var enemySpaceship : enemies) {
+      Scene.ENEMIES.attachChild(enemySpaceship.spatial());
+    }
     return null;
   }
-
-  private static Optional<Spaceship> forLevel(int minLevel, EnemyDef enemy, float tpf) {
-    if (level < minLevel) {
-      // level criteria not met
-      return Optional.empty();
-    }
-    return EnemySpawner.createEnemy(Scene.ENEMIES, enemy, tpf);
-  }
-
 
   public void bossKilled() {
     Contexts.switchContext(ShopContext.class);
@@ -163,7 +144,7 @@ public final class LevelContext implements GameContext {
     return result;
   }
 
-  private Void spawnBoss(float tpf) {
+  private Void spawnBoss() {
     if (!Scene.ENEMIES.getChildren().isEmpty()) {
       // Let the player kill the rest of the enemies before spawning the boss
       return null;
@@ -172,8 +153,8 @@ public final class LevelContext implements GameContext {
     SoundUtil.music(boss.spaceship().name());
 
     // Bosses are never in cooldown
-    var spawned = EnemySpawner.createEnemy(Scene.ENEMIES, boss, tpf);
-    Scene.ENEMIES.attachChild(spawned.get().spatial());
+    var spawned = EnemySpawner.spawnBoss(boss, level);
+    Scene.ENEMIES.attachChild(spawned.spatial());
     return null;
   }
 
@@ -182,11 +163,11 @@ public final class LevelContext implements GameContext {
       case 1 -> EnemySpawner.BOSS_1;
       case 2 -> EnemySpawner.BOSS_2;
       case 3 -> EnemySpawner.BOSS_3;
-      default -> RandomUtil.formallyDistributed(List.of(
+      default -> RandomUtil.formallyDistributed(
           EnemySpawner.BOSS_1,
           EnemySpawner.BOSS_2,
           EnemySpawner.BOSS_3
-      ));
+      );
     };
   }
 
