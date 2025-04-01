@@ -14,6 +14,7 @@ import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.spaceship.SpaceshipDefinitions;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.model.upgrade.UpgradeType;
+import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.LangUtil;
 import com.dam.demo.util.MathUtil;
@@ -162,7 +163,9 @@ public enum EnemySpawner {
     var spaceship = AssetUtil.spaceship(spaceshipDef);
     var upgrades = upgrades(level, def);
     upgrades.forEach(spaceship::addUpgrade);
+
     var spatial = spaceship.spatial();
+    UpgradeUtil.applyColors(spatial, List.of(), upgrades);
     spatial.setName(spaceshipDef.name());
     spatial.setLocalTranslation(getSpawnPosition(spaceship.dimensions()));
     spatial.addControl(new SpaceshipControl(def.behaviour().apply(spaceship)));

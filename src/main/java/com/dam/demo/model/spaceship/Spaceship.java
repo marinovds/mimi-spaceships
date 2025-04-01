@@ -13,6 +13,7 @@ import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
+import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.LangUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,6 +21,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public record Spaceship(
@@ -88,6 +90,7 @@ public record Spaceship(
   }
 
   public Spaceship addUpgrade(Upgrade upgrade) {
+
     var updated = LangUtil.addToList(upgrades(), upgrade);
     spatial.setUserData(UPGRADE, JsonUtil.write(updated));
 
@@ -105,13 +108,15 @@ public record Spaceship(
 
   public Spaceship addBuff(Buff buff) {
     var updated = LangUtil.replace(buffs(), buff, x -> x.upgrade().type() == buff.upgrade().type());
-
     return setBuffs(updated);
   }
 
   public Spaceship setBuffs(List<Buff> buffs) {
-    spatial.setUserData(BUFF, JsonUtil.write(buffs));
+    Function<List<Buff>, List<Upgrade>> f = x -> x.stream().map(Buff::upgrade).toList();
+    var existing = buffs();
+    UpgradeUtil.applyColors(spatial(), f.apply(existing), f.apply(buffs));
 
+    spatial.setUserData(BUFF, JsonUtil.write(buffs));
     return this;
   }
 

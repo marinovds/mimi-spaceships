@@ -30,9 +30,10 @@ public class BonusControl extends AbstractControl {
   protected void controlUpdate(float tpf) {
     var dimensions = Dimensions.of(spatial);
     spatial.move(aim.mult(tpf * speed));
+    var player = Contexts.contextByClass(LevelContext.class).player;
 
-    if (MathUtil.collided(Contexts.contextByClass(LevelContext.class).player.spatial(), spatial)) {
-      bonus.accept(Contexts.contextByClass(LevelContext.class).player);
+    if (MathUtil.collided(player.spatial(), spatial)) {
+      bonus.accept(player);
       SoundUtil.play("coin");
       spatial.removeFromParent();
     }

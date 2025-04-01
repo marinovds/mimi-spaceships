@@ -20,7 +20,7 @@ import com.jme3.scene.Spatial;
 
 public final class LevelContext implements GameContext {
 
-  private static final int BASE_SCORE = 3_000;
+  private static final int BASE_SCORE = 1_500;
 
   private final Node guiNode;
   private final Hud hud;

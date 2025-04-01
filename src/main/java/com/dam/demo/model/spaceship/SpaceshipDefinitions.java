@@ -37,7 +37,7 @@ public enum SpaceshipDefinitions {
       300,
       350,
       500,
-      900
+      0
   );
 
   public static final SpaceshipDefinition PLAYER_DEF = new SpaceshipDefinition(

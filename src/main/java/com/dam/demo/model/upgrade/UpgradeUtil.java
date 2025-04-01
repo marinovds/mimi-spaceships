@@ -19,6 +19,7 @@ import com.jme3.scene.Spatial;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -29,16 +30,6 @@ public enum UpgradeUtil {
   public static final ColorRGBA COLOR_ATTACK_DAMAGE = new ColorRGBA(10, 0, 0, 1);
   public static final ColorRGBA COLOR_ATTACK_SPEED = ColorRGBA.Green;
   public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.LightGray;
-
-  public static ColorRGBA getUpgradeTypeColor(UpgradeType type) {
-    return switch (type) {
-      case HEALTH -> ColorRGBA.White; // Should not happen
-      case ATTACK_DAMAGE -> COLOR_ATTACK_DAMAGE;
-      case ATTACK_SPEED -> COLOR_ATTACK_SPEED;
-      case SHOT_SPEED -> COLOR_SHOT_SPEED;
-      case MOVEMENT_SPEED -> COLOR_SPEED;
-    };
-  }
 
   public static void spawnBonus(Vector3f location) {
     if (RANDOM.nextInt(4) != 0) {
@@ -123,6 +114,37 @@ public enum UpgradeUtil {
           shot.cooldown()
       );
       case MOVEMENT_SPEED, HEALTH -> shot;
+    };
+  }
+
+  public static void applyColors(Spatial spatial, List<Upgrade> existing, List<Upgrade> current) {
+    existing.stream()
+        .filter(upgradeIsMissing(current))
+        .forEach(x -> addColor(spatial, x.type(), -1));
+
+    current.stream()
+        .filter(upgradeIsMissing(existing))
+        .forEach(x -> addColor(spatial, x.type(), 1));
+  }
+
+  private static void addColor(Spatial spatial, UpgradeType upgradeType, int mult) {
+    var existingColor = AssetUtil.getColor(spatial);
+    var upgradeColor = getUpgradeTypeColor(upgradeType).mult(mult);
+    AssetUtil.setColor(spatial, existingColor.add(upgradeColor));
+  }
+
+  private static Predicate<Upgrade> upgradeIsMissing(List<Upgrade> list) {
+    return x -> list.stream()
+        .noneMatch(y -> y.type() == x.type() && y.percentage() == x.percentage());
+  }
+
+  private static ColorRGBA getUpgradeTypeColor(UpgradeType type) {
+    return switch (type) {
+      case HEALTH -> ColorRGBA.White; // Should not happen
+      case ATTACK_DAMAGE -> COLOR_ATTACK_DAMAGE;
+      case ATTACK_SPEED -> COLOR_ATTACK_SPEED;
+      case SHOT_SPEED -> COLOR_SHOT_SPEED;
+      case MOVEMENT_SPEED -> COLOR_SPEED;
     };
   }
 }
