@@ -157,4 +157,11 @@ public enum AssetUtil {
 
     return text;
   }
+
+  public static BitmapText text(String text, int size) {
+    var result = text(size);
+    result.setText(text);
+
+    return result;
+  }
 }

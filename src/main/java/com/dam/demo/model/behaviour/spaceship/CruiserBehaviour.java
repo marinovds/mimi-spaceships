@@ -6,9 +6,10 @@ import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
+import com.dam.demo.model.behaviour.attack.AttackBehaviour;
+import com.dam.demo.model.behaviour.attack.PredicateBehaviour;
 import com.dam.demo.model.behaviour.attack.ShotBehaviour;
 import com.dam.demo.model.spaceship.Spaceship;
-import com.dam.demo.util.JsonUtil;
 import com.dam.util.RandomUtil;
 import com.jme3.scene.Spatial;
 
@@ -16,14 +17,17 @@ public class CruiserBehaviour implements SpaceshipBehaviour {
 
   private final Spaceship spaceship;
   private final CruiserAttack attack;
-  private final ShotBehaviour behaviour;
+  private final AttackBehaviour behaviour;
 
   private int direction;
 
   public CruiserBehaviour(Spaceship spaceship) {
     this.spaceship = spaceship;
-    this.attack = JsonUtil.read(spaceship.attack(), CruiserAttack.class);
-    this.behaviour = new ShotBehaviour(ShipType.ENEMY, spaceship::location, attack.shot());
+    this.attack = spaceship.attack(CruiserAttack.class);
+    this.behaviour = new PredicateBehaviour(
+        () -> RandomUtil.RANDOM.nextInt(attack.random()) == 0,
+        new ShotBehaviour(ShipType.ENEMY, spaceship::location, attack.shot())
+    );
     this.direction = formallyDistributed(1, -1);
   }
 
@@ -53,9 +57,7 @@ public class CruiserBehaviour implements SpaceshipBehaviour {
   @Override
   public void attack(float tpf) {
     behaviour.tick(tpf);
-    if (RandomUtil.RANDOM.nextInt(attack.random()) == 0) {
-      behaviour.tryAttack(spaceship.improvements());
-    }
+    behaviour.tryAttack(spaceship.improvements());
   }
 
   @Override
@@ -63,5 +65,7 @@ public class CruiserBehaviour implements SpaceshipBehaviour {
     return spaceship;
   }
 
-  public record CruiserAttack(Shot shot, int random) implements SpaceshipAttack{}
+  public record CruiserAttack(Shot shot, int random) implements SpaceshipAttack {
+
+  }
 }

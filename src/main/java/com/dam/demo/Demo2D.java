@@ -38,7 +38,6 @@ public class Demo2D extends SimpleApplication {
   @Override
   public void simpleInitApp() {
     AssetUtil.initialize(assetManager, settings);
-    Contexts.initialize(this);
 
     // setup camera for 2D games
     cam.setParallelProjection(true);
@@ -52,7 +51,7 @@ public class Demo2D extends SimpleApplication {
 
     guiNode.attachChild(SoundUtil.initialize());
     SoundUtil.music("ambient");
-
+    Contexts.initialize(this);
   }
 
   @Override

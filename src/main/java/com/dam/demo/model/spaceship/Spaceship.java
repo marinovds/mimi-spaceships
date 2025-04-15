@@ -11,6 +11,7 @@ import static com.dam.demo.model.UserConstants.UPGRADE;
 import com.dam.demo.enemies.Tag;
 import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.UserConstants;
+import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.model.upgrade.UpgradeUtil;
@@ -27,15 +28,13 @@ import java.util.stream.Stream;
 public record Spaceship(
     Spatial spatial,
     Dimensions dimensions,
-    Set<Tag> tags,
-    String attack) {
+    Set<Tag> tags) {
 
   public static Spaceship of(Spatial spatial) {
     return new Spaceship(
         spatial,
         Dimensions.of(spatial),
-        Tag.parse(spatial.getUserData(TAGS)),
-        spatial.getUserData(ATTACK)
+        Tag.parse(spatial.getUserData(TAGS))
     );
   }
 
@@ -57,6 +56,10 @@ public record Spaceship(
 
   public Vector3f location() {
     return spatial.getWorldTranslation();
+  }
+
+  public <T extends SpaceshipAttack> T attack(Class<T> clazz) {
+    return JsonUtil.read(spatial.getUserData(ATTACK), clazz);
   }
 
   public Spaceship addCoins(int amount) {
@@ -86,12 +89,13 @@ public record Spaceship(
       return List.of();
     }
 
-    return JsonUtil.read(buffs, new TypeReference<>() {});
+    return JsonUtil.read(buffs, new TypeReference<>() {
+    });
   }
 
   public Spaceship addUpgrade(Upgrade upgrade) {
 
-    var updated = LangUtil.addToList(upgrades(), upgrade);
+    var updated = LangUtil.replace(upgrades(), upgrade, x -> x.type() == upgrade.type());
     spatial.setUserData(UPGRADE, JsonUtil.write(updated));
 
     return this;
@@ -103,7 +107,8 @@ public record Spaceship(
       return List.of();
     }
 
-    return JsonUtil.read(buffs, new TypeReference<>() {});
+    return JsonUtil.read(buffs, new TypeReference<>() {
+    });
   }
 
   public Spaceship addBuff(Buff buff) {

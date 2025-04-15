@@ -3,7 +3,6 @@ package com.dam.demo.util;
 import static java.lang.Math.abs;
 
 import com.dam.demo.model.Dimensions;
-import com.dam.demo.model.spaceship.Spaceship;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -36,20 +35,6 @@ public enum MathUtil {
 
     return abs(a.getLocalTranslation().x - b.getLocalTranslation().x) < widthDiff
         && abs(a.getLocalTranslation().y - b.getLocalTranslation().y) < heightDiff;
-  }
-
-  public static Duration subtractDuration(Duration current, float tpf) {
-    if (current == null) {
-      return Duration.ZERO;
-    }
-
-    var nanos = (int) (tpf * 1_000_000_000f);
-    var result = current.minusNanos(nanos);
-    return result.isNegative() ? Duration.ZERO : result;
-  }
-
-  public static boolean isDead(Spaceship spaceship) {
-    return spaceship.health() <= 0;
   }
 
   /**
@@ -96,6 +81,15 @@ public enum MathUtil {
         : (long) Math.ceil(base.toMillis() * mult);
 
     return Duration.ofMillis(result);
+  }
+
+  public static int increase(int base, int percentage, int times) {
+    var mult = 1f + percentage / 100f;
+    float result = base;
+    for (int i = 1; i < times; i++) {
+      result *= mult;
+    }
+    return Math.round(result);
   }
 }
 

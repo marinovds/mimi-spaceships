@@ -2,8 +2,8 @@ package com.dam.demo.controls;
 
 import static java.lang.Math.min;
 
+import com.dam.demo.model.Ticker;
 import com.dam.demo.util.AssetUtil;
-import com.dam.demo.util.MathUtil;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -14,15 +14,13 @@ import java.time.Duration;
 
 public class ParticleControl extends AbstractControl {
 
-  private Duration span;
-  private final Duration duration;
+  private final Ticker span;
   private final ColorRGBA color;
   private Vector3f velocity;
 
   public ParticleControl(Vector3f velocity, ColorRGBA color) {
     this.velocity = velocity;
-    this.span = Duration.ofMillis(1_500);
-    this.duration = span;
+    this.span = Ticker.of(Duration.ofMillis(1_500));
     this.color = color;
   }
 
@@ -50,16 +48,17 @@ public class ParticleControl extends AbstractControl {
     spatial.scale(0.65f);
 
     // is particle expired?
-    span = MathUtil.subtractDuration(span, tpf);
-    if (span.isZero())  {
+    span.tick(tpf);
+    if (span.isDone()) {
       spatial.removeFromParent();
     }
   }
 
   private float calculateAlpha(float speed) {
-    long difTime = duration.minus(span).toMillis();
+    var current = span.currentDuration();
+    long difTime = span.baseDuration().minus(current).toMillis();
 
-    float percentLife = 1 - (float) difTime / span.toMillis();
+    float percentLife = 1 - (float) difTime / current.toMillis();
     return min(1.5f, min(percentLife * 2, speed));
   }
 

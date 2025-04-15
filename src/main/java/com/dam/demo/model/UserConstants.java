@@ -3,6 +3,8 @@ package com.dam.demo.model;
 public enum UserConstants {
   ;
 
+  public static final String BASE_HEALTH = "baseHealth";
+  public static final String MAX_HEALTH = "maxHealth";
   public static final String HEALTH = "health";
   public static final String COINS = "coins";
   public static final String POINTS = "points";

@@ -4,22 +4,23 @@ import static com.dam.demo.listeners.KeyboardListener.Input.DOWN;
 import static com.dam.demo.listeners.KeyboardListener.Input.SHOOT;
 import static com.dam.demo.listeners.KeyboardListener.Input.UP;
 
-import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.Boundary;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.attack.SpaceshipAttack;
-import com.dam.demo.model.behaviour.attack.ShotBehaviour;
+import com.dam.demo.model.behaviour.attack.AttackBehaviour;
+import com.dam.demo.model.behaviour.attack.ParallelBehaviour;
+import com.dam.demo.model.shop.ShopUtil;
 import com.dam.demo.model.spaceship.Spaceship;
-import com.dam.demo.util.JsonUtil;
 import com.jme3.scene.Spatial;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlayerBehaviour implements SpaceshipBehaviour {
 
   private final Spaceship spaceship;
-  private final ShotBehaviour behaviour;
+  private final AttackBehaviour behaviour;
   private final Map<Input, Boolean> inputs = new EnumMap<>(Map.of(
       UP, false,
       DOWN, false,
@@ -31,10 +32,17 @@ public class PlayerBehaviour implements SpaceshipBehaviour {
 
   public PlayerBehaviour(Spaceship spaceship) {
     this.spaceship = spaceship;
-    var attack = JsonUtil.read(spaceship.attack(), PlayerAttack.class);
-    this.behaviour = new ShotBehaviour(ShipType.PLAYER, spaceship::location, attack.shot());
+    this.behaviour = attackBehaviour(spaceship);
     this.topReached = false;
     this.bottomReached = false;
+  }
+
+  private AttackBehaviour attackBehaviour(Spaceship spaceship) {
+    var attack = spaceship.attack(PlayerAttack.class);
+    var bullets = ParallelBehaviour.levelCannons(spaceship, ShopUtil.CANNONS, attack.bullet());
+    var rockets = ParallelBehaviour.levelCannons(spaceship, ShopUtil.ROCKETS, attack.rocket());
+
+    return new ParallelBehaviour(List.of(bullets, rockets));
   }
 
   @Override
@@ -82,7 +90,10 @@ public class PlayerBehaviour implements SpaceshipBehaviour {
     inputs.put(input, isPressed);
   }
 
-  public record PlayerAttack(Shot shot) implements SpaceshipAttack {
+  public record PlayerAttack(
+      Shot bullet,
+      Shot rocket
+  ) implements SpaceshipAttack {
 
   }
 }

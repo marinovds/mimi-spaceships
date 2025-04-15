@@ -8,5 +8,7 @@ public record SpawnCriteria(
     int maxNumber,
     int level) {
 
-  public static final SpawnCriteria NONE = new SpawnCriteria(Duration.ZERO, 0, 1, 0);
+  public static SpawnCriteria none(int level) {
+    return new SpawnCriteria(Duration.ZERO, 0, 1, level);
+  }
 }

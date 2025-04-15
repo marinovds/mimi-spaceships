@@ -1,30 +1,30 @@
 package com.dam.demo.model.behaviour.attack;
 
+import com.dam.demo.model.Ticker;
 import com.dam.demo.model.upgrade.Upgrade;
-import com.dam.demo.util.MathUtil;
 import java.time.Duration;
 import java.util.List;
 
 public class RotaryBehaviour implements AttackBehaviour {
 
+  private final Ticker ticker;
   private final Duration attackDuration;
   private final Duration cooldownDuration;
   private final List<AttackBehaviour> attacks;
 
   private RotaryStatus status;
   private int attackIndex;
-  private Duration duration;
 
   public RotaryBehaviour(
       List<AttackBehaviour> attacks,
       Duration attackDuration,
       Duration cooldownDuration) {
     this.attacks = attacks;
+    this.ticker = Ticker.of(attackDuration);
     this.attackDuration = attackDuration;
     this.cooldownDuration = cooldownDuration;
 
     this.status = RotaryStatus.COOLDOWN;
-    this.duration = attackDuration;
     this.attackIndex = 0;
   }
 
@@ -39,22 +39,22 @@ public class RotaryBehaviour implements AttackBehaviour {
   @Override
   public void tick(float tpf) {
     attacks.get(attackIndex).tick(tpf);
-    duration = MathUtil.subtractDuration(duration, tpf);
+    ticker.tick(tpf);
   }
 
   private boolean cooldown() {
-    if (duration.isZero()) {
+    if (ticker.isDone()) {
       status = RotaryStatus.ATTACKING;
-      duration = attackDuration;
+      ticker.reset(attackDuration);
     }
     return false;
   }
 
   private boolean attack(List<Upgrade> buffs) {
     var result = attacks.get(attackIndex).tryAttack(buffs);
-    if (duration.isZero()) {
+    if (ticker.isDone()) {
       status = RotaryStatus.COOLDOWN;
-      duration = cooldownDuration;
+      ticker.reset(cooldownDuration);
       attackIndex = nextIndex(attacks.size(), attackIndex);
     }
     return result;

@@ -5,10 +5,9 @@ import static java.lang.Math.signum;
 
 import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.model.Boundary;
-import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
-import com.dam.demo.util.JsonUtil;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.jme3.math.FastMath;
 import com.jme3.scene.Spatial;
 import java.time.Duration;
@@ -24,7 +23,7 @@ public class BomberBehaviour implements SpaceshipBehaviour {
 
   public BomberBehaviour(Spaceship spaceship) {
     this.spaceship = spaceship;
-    var attack = JsonUtil.read(spaceship.attack(), BomberAttack.class);
+    var attack = spaceship.attack(BomberAttack.class);
     this.collision = new CollisionBehaviour(
         attack.collision(),
         Duration.ofMillis(500),

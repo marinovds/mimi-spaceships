@@ -2,7 +2,6 @@ package com.dam.demo.util;
 
 import static com.dam.demo.model.UserConstants.HEALTH;
 import static com.dam.demo.model.UserConstants.LAST_HIT;
-import static com.dam.demo.util.MathUtil.isDead;
 import static java.lang.Math.max;
 
 import com.dam.demo.controls.ParticleManager;
@@ -89,6 +88,10 @@ public enum DamageUtil {
 
     SoundUtil.play("hit");
     return true;
+  }
+
+  private static boolean isDead(Spaceship spaceship) {
+    return spaceship.health() == 0;
   }
 
   private static Instant getLastHit(Spaceship spaceship) {

@@ -43,7 +43,10 @@ public enum SpaceshipDefinitions {
   public static final SpaceshipDefinition PLAYER_DEF = new SpaceshipDefinition(
       "player",
       Set.of(ShipType.PLAYER),
-      new PlayerAttack(new Shot(bullet(10), 1100, Duration.ofMillis(500))),
+      new PlayerAttack(
+          new Shot(bullet(10), 1100, Duration.ofMillis(500)),
+          new Shot(rocket(20), 700, Duration.ofMillis(500))
+      ),
       600,
       100,
       0,

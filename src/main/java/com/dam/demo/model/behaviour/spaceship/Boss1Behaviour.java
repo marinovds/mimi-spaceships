@@ -8,13 +8,9 @@ import com.dam.demo.model.behaviour.attack.ParallelBehaviour;
 import com.dam.demo.model.behaviour.attack.RotaryBehaviour;
 import com.dam.demo.model.behaviour.attack.ShotBehaviour;
 import com.dam.demo.model.spaceship.Spaceship;
-import com.dam.demo.util.JsonUtil;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.time.Duration;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Boss1Behaviour implements SpaceshipBehaviour {
 
@@ -31,19 +27,10 @@ public class Boss1Behaviour implements SpaceshipBehaviour {
   }
 
   private static RotaryBehaviour attackBehaviour(Spaceship spaceship) {
-    var def = JsonUtil.read(spaceship.attack(), Boss1Attack.class);
-    Function<Vector3f, Supplier<Vector3f>> f = x -> () -> spaceship.location().add(x);
-    var offset = new Vector3f(0, spaceship.dimensions().height() / 2f, 0);
+    var def = spaceship.attack(Boss1Attack.class);
     var fastShot = new ShotBehaviour(ShipType.BOSS, spaceship::location, def.fastShot());
-    var dualRockets = new ParallelBehaviour(List.of(
-        new ShotBehaviour(ShipType.BOSS, f.apply(offset), def.dualRockets()),
-        new ShotBehaviour(ShipType.BOSS, f.apply(offset.negate()),
-            def.dualRockets())
-    ));
-    var dualShot = new ParallelBehaviour(List.of(
-        new ShotBehaviour(ShipType.BOSS, f.apply(offset), def.dualShot()),
-        new ShotBehaviour(ShipType.BOSS, f.apply(offset.negate()), def.dualShot())
-    ));
+    var dualRockets = ParallelBehaviour.multipleCannons(spaceship, def.dualRockets(), 2);
+    var dualShot = ParallelBehaviour.multipleCannons(spaceship, def.dualShot(), 2);
 
     return new RotaryBehaviour(
         List.of(

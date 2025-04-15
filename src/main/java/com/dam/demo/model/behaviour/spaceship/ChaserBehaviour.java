@@ -10,7 +10,6 @@ import com.dam.demo.model.Boundary;
 import com.dam.demo.model.attack.SpaceshipAttack;
 import com.dam.demo.model.behaviour.attack.CollisionBehaviour;
 import com.dam.demo.model.spaceship.Spaceship;
-import com.dam.demo.util.JsonUtil;
 import com.dam.demo.util.LangUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
@@ -28,7 +27,7 @@ public class ChaserBehaviour implements SpaceshipBehaviour {
 
   public ChaserBehaviour(Spaceship spaceship) {
     this.spaceship = spaceship;
-    var attack = JsonUtil.read(spaceship.attack(), ChaserAttack.class);
+    var attack = spaceship.attack(ChaserAttack.class);
     this.baseSpeed = spaceship.speed();
     this.speedMult = attack.speedMultiplier();
     this.collision = new CollisionBehaviour(

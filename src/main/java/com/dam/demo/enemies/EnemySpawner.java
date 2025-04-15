@@ -6,6 +6,7 @@ import static com.dam.util.RandomUtil.RANDOM;
 
 import com.dam.demo.controls.SpaceshipControl;
 import com.dam.demo.model.Dimensions;
+import com.dam.demo.model.Ticker;
 import com.dam.demo.model.behaviour.spaceship.BomberBehaviour;
 import com.dam.demo.model.behaviour.spaceship.Boss1Behaviour;
 import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour;
@@ -17,7 +18,6 @@ import com.dam.demo.model.upgrade.UpgradeType;
 import com.dam.demo.model.upgrade.UpgradeUtil;
 import com.dam.demo.util.AssetUtil;
 import com.dam.demo.util.LangUtil;
-import com.dam.demo.util.MathUtil;
 import com.dam.util.RandomUtil;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -32,19 +32,19 @@ public enum EnemySpawner {
 
   public static final EnemyDef BOSS_1 = new EnemyDef(
       SpaceshipDefinitions.BOSS_1_DEF,
-      SpawnCriteria.NONE,
+      SpawnCriteria.none(1),
       Boss1Behaviour::new
   );
 
   public static final EnemyDef BOSS_2 = new EnemyDef(
       SpaceshipDefinitions.BOSS_1_DEF,
-      SpawnCriteria.NONE,
+      SpawnCriteria.none(2),
       Boss1Behaviour::new
   );
 
   public static final EnemyDef BOSS_3 = new EnemyDef(
       SpaceshipDefinitions.BOSS_1_DEF,
-      SpawnCriteria.NONE,
+      SpawnCriteria.none(3),
       Boss1Behaviour::new
   );
 
@@ -92,8 +92,8 @@ public enum EnemySpawner {
     var enemyCooldown = getEnemyCooldown(enemyNode, enemy);
     if (shouldNotSpawn(enemyCooldown, criteria, enemies)) {
       // Tick the cooldown
-      var cooldown = MathUtil.subtractDuration(enemyCooldown, tpf);
-      setEnemyCooldown(enemyNode, enemy, cooldown);
+      var cooldown = Ticker.of(enemyCooldown).tick(tpf);
+      setEnemyCooldown(enemyNode, enemy, cooldown.currentDuration());
 
       return Optional.empty();
     }
@@ -111,8 +111,10 @@ public enum EnemySpawner {
       // No upgrades this early on
       return List.of();
     }
+    // EG: at lvl 4, cruiser will get 1 upgrade roll
+    var initialSpawnLevel = lastMobLevel + definition.spawn().level() - 1;
 
-    return IntStream.range(lastMobLevel + definition.spawn().level(), level)
+    return IntStream.range(initialSpawnLevel, level)
         .filter(x -> RANDOM.nextInt(2) == 0)
         .mapToObj(x -> RandomUtil.formallyDistributed(UpgradeType.values()))
         .map(x -> new Upgrade(20, x))
@@ -123,7 +125,7 @@ public enum EnemySpawner {
       Duration enemyCooldown,
       SpawnCriteria criteria,
       List<Spaceship> enemies) {
-    if (criteria == SpawnCriteria.NONE) {
+    if (!criteria.cooldown().isPositive()) {
       return false;
     }
 

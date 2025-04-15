@@ -10,8 +10,10 @@ import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.UserConstants;
 import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour;
+import com.dam.demo.model.shop.ShopUtil;
 import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.spaceship.SpaceshipDefinitions;
+import com.dam.demo.util.MathUtil;
 import com.dam.demo.util.SoundUtil;
 import com.dam.util.RandomUtil;
 import com.jme3.app.SimpleApplication;
@@ -20,7 +22,7 @@ import com.jme3.scene.Spatial;
 
 public final class LevelContext implements GameContext {
 
-  private static final int BASE_SCORE = 1_500;
+  private static final int BASE_SCORE = 300;
 
   private final Node guiNode;
   private final Hud hud;
@@ -103,7 +105,7 @@ public final class LevelContext implements GameContext {
   }
 
   private Void spawnEnemies(float tpf) {
-    if (player.points() + enemyPoints() >= getLevelScore(level)) {
+    if (player.points() + enemyPoints() >= MathUtil.increase(BASE_SCORE, 150, level)) {
       state = LevelState.BOSS_SPAWNING;
       return null;
     }
@@ -138,6 +140,7 @@ public final class LevelContext implements GameContext {
     Spaceship result = spaceship(SpaceshipDefinitions.PLAYER_DEF);
     var dimensions = result.dimensions();
     var spatial = result.spatial();
+    ShopUtil.setLevel(ShopUtil.CANNONS, 1, result);
     spatial.setLocalTranslation(dimensions.radius(), screenHeight() / 2f, 0);
     spatial.addControl(new SpaceshipControl(new PlayerBehaviour(result)));
 
@@ -176,14 +179,6 @@ public final class LevelContext implements GameContext {
         .stream()
         .mapToInt(x -> x.getUserData(UserConstants.POINTS))
         .sum();
-  }
-
-  private static int getLevelScore(int level) {
-    int result = BASE_SCORE;
-    for (int i = 1; i < level; i++) {
-      result = 2 * result + (result / 2);
-    }
-    return result;
   }
 
   private PlayerBehaviour playerBehaviour() {

@@ -2,6 +2,7 @@ package com.dam.demo.model.spaceship;
 
 import static com.dam.demo.enemies.Tag.SpatialType.SPACESHIP;
 import static com.dam.demo.model.UserConstants.ATTACK;
+import static com.dam.demo.model.UserConstants.BASE_HEALTH;
 import static com.dam.demo.model.UserConstants.COINS;
 import static com.dam.demo.model.UserConstants.HEALTH;
 import static com.dam.demo.model.UserConstants.POINTS;
@@ -24,6 +25,7 @@ public record SpaceshipDefinition(
     int points) {
 
   public void applyTo(Spatial spatial) {
+    spatial.setUserData(BASE_HEALTH, health);
     spatial.setUserData(HEALTH, health);
     spatial.setUserData(SPEED, speed);
     spatial.setUserData(ATTACK, JsonUtil.write(attack));

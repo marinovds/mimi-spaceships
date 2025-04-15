@@ -11,6 +11,7 @@ public class Contexts {
   private static HighScoreContext highScore;
 
   private static GameContext currentContext;
+  private static GameContext lastContext;
 
   public static void initialize(SimpleApplication app) {
     Contexts.menu = new MenuContext(app);
@@ -19,29 +20,44 @@ public class Contexts {
     Contexts.highScore = new HighScoreContext(app);
 
     currentContext = menu;
+    lastContext = null;
     currentContext.enable();
   }
 
   public static void onInput(Input input, boolean isPressed) {
     if (input == Input.PAUSE && isPressed) {
       if (currentContext == menu) {
-        // Already in menu
+        if (lastContext == null) {
+          return;
+        }
+
+        switchContext(lastContext);
         return;
       }
-      switchContext(MenuContext.class);
+      switchContext(menu);
       return;
     }
+
     currentContext.onInput(input, isPressed);
   }
 
   public static void switchContext(Class<? extends GameContext> context) {
     var actual = contextByClass(context);
+    switchContext(actual);
+  }
+
+  private static void switchContext(GameContext context) {
     currentContext.disable();
-    currentContext = actual;
+    lastContext = currentContext;
+    currentContext = context;
     currentContext.enable();
   }
 
-  public static <T extends  GameContext> T contextByClass(Class<T> clazz) {
+  public static void switchLastContext() {
+    switchContext(lastContext);
+  }
+
+  public static <T extends GameContext> T contextByClass(Class<T> clazz) {
     if (clazz == MenuContext.class) {
       return (T) menu;
     }

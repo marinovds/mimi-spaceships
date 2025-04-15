@@ -7,10 +7,11 @@ import com.dam.demo.enemies.Tag.ShipType;
 import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
 import com.dam.demo.game.Scene;
+import com.dam.demo.model.Ticker;
 import com.dam.demo.model.attack.Shot;
+import com.dam.demo.model.spaceship.Spaceship;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.util.AssetUtil;
-import com.dam.demo.util.MathUtil;
 import com.dam.demo.util.SoundUtil;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -20,6 +21,7 @@ import com.jme3.scene.Spatial;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public class ShotBehaviour implements AttackBehaviour {
@@ -27,26 +29,24 @@ public class ShotBehaviour implements AttackBehaviour {
   private final ShipType shooter;
   private final Supplier<Vector3f> location;
   private final Vector3f aim;
-
   private final Shot shot;
-  private Duration cooldown;
+  private final Ticker ticker;
 
   public ShotBehaviour(ShipType shooter, Supplier<Vector3f> location, Shot shot) {
     this.shooter = shooter;
     this.location = location;
     this.shot = shot;
-
     this.aim = getAim(shooter);
-    this.cooldown = Duration.ZERO;
+    this.ticker = Ticker.of(Duration.ZERO);
   }
 
   @Override
   public boolean tryAttack(List<Upgrade> buffs) {
-    if (cooldown.isPositive()) {
+    if (!ticker.isDone()) {
       return false;
     }
     var shot = upgradeShot(this.shot, buffs);
-    cooldown = shot.cooldown();
+    ticker.reset(shot.cooldown());
     var proj = shoot(location.get(), aim, shot);
     var node = shooter == ShipType.PLAYER ? Scene.PLAYER_BULLETS : Scene.ENEMY_BULLETS;
     node.attachChild(proj);
@@ -55,7 +55,7 @@ public class ShotBehaviour implements AttackBehaviour {
 
   @Override
   public void tick(float tpf) {
-    cooldown = MathUtil.subtractDuration(cooldown, tpf);
+    ticker.tick(tpf);
   }
 
   private Spatial shoot(Vector3f location, Vector3f aim, Shot shot) {
@@ -133,4 +133,22 @@ public class ShotBehaviour implements AttackBehaviour {
     return new Vector3f(-1, 0, 0);
   }
 
+  public static Supplier<Vector3f> offset(Spaceship spaceship, int numberOfCannons) {
+
+    return offset(spaceship, numberOfCannons, UnaryOperator.identity());
+  }
+
+  public static Supplier<Vector3f> offsetNegate(Spaceship spaceship, int numberOfCannons) {
+
+    return offset(spaceship, numberOfCannons, Vector3f::negate);
+  }
+
+  private static Supplier<Vector3f> offset(
+      Spaceship spaceship,
+      int numberOfCannons,
+      UnaryOperator<Vector3f> f) {
+    var offset = new Vector3f(0, spaceship.dimensions().height() / numberOfCannons, 0);
+
+    return () -> spaceship.location().add(f.apply(offset));
+  }
 }

@@ -8,11 +8,11 @@ import com.dam.demo.game.Contexts;
 import com.dam.demo.game.LevelContext;
 import com.dam.demo.game.Scene;
 import com.dam.demo.model.Dimensions;
+import com.dam.demo.model.Ticker;
 import com.dam.demo.model.behaviour.spaceship.SpaceshipBehaviour;
 import com.dam.demo.model.upgrade.Buff;
 import com.dam.demo.model.upgrade.Upgrade;
 import com.dam.demo.model.upgrade.UpgradeType;
-import com.dam.demo.util.MathUtil;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
@@ -60,7 +60,7 @@ public final class SpaceshipControl extends AbstractControl {
     return behaviour.spaceship()
         .buffs()
         .stream()
-        .map(x -> new Buff(x.upgrade(), MathUtil.subtractDuration(x.duration(), tpf)))
+        .map(x -> new Buff(x.upgrade(), Ticker.tick(x.duration(), tpf)))
         .filter(x -> x.duration().isPositive())
         .toList();
   }
