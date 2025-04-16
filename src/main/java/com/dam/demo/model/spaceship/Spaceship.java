@@ -137,4 +137,7 @@ public record Spaceship(
     return tags.contains(tag);
   }
 
+  public int maxHealth() {
+    return spatial.getUserData(UserConstants.MAX_HEALTH);
+  }
 }

@@ -32,13 +32,13 @@ public enum UpgradeUtil {
   public static final ColorRGBA COLOR_SHOT_SPEED = ColorRGBA.LightGray;
 
   public static void spawnBonus(Vector3f location) {
-    if (RANDOM.nextInt(1) != 0) {
+    if (RANDOM.nextInt(4) != 0) {
       return;
     }
     var buff = weighted(
-        option(0, bonus("buffCoin", location, s -> s.addCoins(15))),
-        option(0, bonus("buffHeart", location, s -> s.addHealth(20))),
-        option(0, bonus("buffStar", location, s -> s.addPoints(300))),
+        option(1, bonus("buffCoin", location, s -> s.addCoins(15))),
+        option(1, bonus("buffHeart", location, s -> s.addHealth(s.maxHealth() / 5))),
+        option(1, bonus("buffStar", location, s -> s.addPoints(300))),
 
         option(1, bonus("buffDamage", location, buff(new Upgrade(100, UpgradeType.ATTACK_DAMAGE)))),
         option(1, bonus("buffSpeed", location, buff(new Upgrade(50, UpgradeType.MOVEMENT_SPEED)))),

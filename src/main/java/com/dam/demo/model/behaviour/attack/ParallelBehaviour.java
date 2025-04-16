@@ -36,7 +36,7 @@ public record ParallelBehaviour(List<AttackBehaviour> attackBehaviours) implemen
         ? Stream.<AttackBehaviour>empty()
         : Stream.of(new ShotBehaviour(shipType, spaceship::location, shot));
     var sideCannons = Stream.<ShotBehaviour>builder();
-    for (int i = 2; i < cannons; i += 2) {
+    for (int i = 2; i <= cannons; i += 2) {
       sideCannons.add(new ShotBehaviour(shipType, offset(spaceship, i), shot));
       sideCannons.add(new ShotBehaviour(shipType, offsetNegate(spaceship, i), shot));
     }
@@ -56,7 +56,7 @@ public record ParallelBehaviour(List<AttackBehaviour> attackBehaviours) implemen
     );
     var sideCannons = Stream.<AttackBehaviour>builder();
 
-    for (int i = 2; i < maxCannons; i += 2) {
+    for (int i = 2; i <= maxCannons; i += 2) {
       var level = i;
       sideCannons.add(new PredicateBehaviour(
           () -> ShopUtil.getLevel(name, spaceship) >= level,

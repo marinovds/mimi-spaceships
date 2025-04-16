@@ -93,7 +93,6 @@ public final class ShopContext implements GameContext {
       var result = new Node("playerCoins");
       var coins = AssetUtil.text("Coins:", 40);
       var amount = AssetUtil.text( 40);
-      amount.setLocalTranslation(512 - amount.getLineWidth(), 0, 0);
 
       result.attachChild(coins);
       result.attachChild(amount);
@@ -104,6 +103,7 @@ public final class ShopContext implements GameContext {
     public void update() {
       var player = Contexts.contextByClass(LevelContext.class).player;
       amount.setText(player.coins() + "");
+      amount.setLocalTranslation(ShopMenuEntry.WIDTH - amount.getLineWidth(), 0, 0);
     }
 
     @Override

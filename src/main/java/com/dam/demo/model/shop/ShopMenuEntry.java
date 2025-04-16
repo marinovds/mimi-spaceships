@@ -17,7 +17,8 @@ import java.util.List;
 
 public class ShopMenuEntry implements MenuEntry {
 
-  public static final int WIDTH = AssetUtil.screenWidth() - 200;
+  private static final int OFFSET = 200;
+  public static final int WIDTH = AssetUtil.screenWidth() - OFFSET;
   public static final int HEIGHT = 40;
 
   private final Spatial spatial;
@@ -42,12 +43,10 @@ public class ShopMenuEntry implements MenuEntry {
     name.setName("name");
 
     var level = AssetUtil.text(30);
-    level.setLocalTranslation(name.getLocalTranslation().x + 400, 0, 0);
     level.setName("level");
 
     var price = AssetUtil.text(30);
     price.setName("price");
-    price.setLocalTranslation(level.getLocalTranslation().x + 50, 0, 0);
 
     var texts = List.of(
         name,
@@ -56,6 +55,7 @@ public class ShopMenuEntry implements MenuEntry {
     );
     result.attachChild(image);
     texts.forEach(result::attachChild);
+    center(price, level);
 
     return new ShopMenuEntry(shopItem, texts, result);
   }
@@ -74,8 +74,8 @@ public class ShopMenuEntry implements MenuEntry {
   public boolean selectable() {
     var player = Contexts.contextByClass(LevelContext.class).player;
     var level = getNextLevel(item.name(), player);
-    return player.coins() >= MathUtil.increase(item.baseCost(), item.costIncrease(), level)
-        && level <= item.maxLevel();
+    return !(player.coins() < MathUtil.increase(item.baseCost(), item.costIncrease(), level)
+        || level > item.maxLevel());
   }
 
   @Override
@@ -105,18 +105,27 @@ public class ShopMenuEntry implements MenuEntry {
     var player = Contexts.contextByClass(LevelContext.class).player;
     var levelText = get("level");
     var priceText = get("price");
-    var level = ShopUtil.getNextLevel(item.name(), player);
-    if (level > item.maxLevel()) {
-      levelText.setText("");
-      priceText.setText("Sold OUT");
-      return;
-    }
-    levelText.setText(level + "");
-    var price = MathUtil.increase(item.baseCost(), item.costIncrease(), level);
-    priceText.setText(price + "");
+    var nextLevel = ShopUtil.getNextLevel(item.name(), player);
+
+    var level = nextLevel > item.maxLevel()
+        ? ""
+        : String.valueOf(nextLevel);
+    var price = nextLevel > item.maxLevel()
+        ? "Sold OUT"
+        : String.valueOf(MathUtil.increase(item.baseCost(), item.costIncrease(), nextLevel));
+
+    levelText.setText(level);
+    priceText.setText(price);
+    center(priceText, levelText);
 
     var color = selectable() ? ColorRGBA.White : ColorRGBA.Gray;
     texts.forEach(x -> x.setColor(color));
+  }
+
+  private static void center(BitmapText price, BitmapText level) {
+    var x = AssetUtil.screenWidth() - OFFSET - price.getLineWidth();
+    price.setLocalTranslation(x, 0, 0);
+    level.setLocalTranslation(x - 30 - level.getLineWidth(), 0, 0);
   }
 
   private BitmapText get(String name) {

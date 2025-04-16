@@ -56,7 +56,7 @@ public enum MenuUtil {
 
     @Override
     public float height() {
-      return text.getHeight();
+      return selectedSize;
     }
 
     @Override
