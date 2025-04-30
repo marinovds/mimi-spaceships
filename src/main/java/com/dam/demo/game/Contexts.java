@@ -20,7 +20,7 @@ public class Contexts {
     Contexts.highScore = new HighScoreContext(app);
 
     currentContext = menu;
-    lastContext = null;
+    lastContext = level;
     currentContext.enable();
   }
 

@@ -32,7 +32,7 @@ public class Hud {
         createText("Health", Spaceship::health),
         createText("Coins", Spaceship::coins),
         createText("Score", Spaceship::points),
-        createText("Level", (x) -> LevelContext.level)
+        createText("Level", (x) -> Contexts.contextByClass(LevelContext.class).level())
     );
 
     entries.forEach(x -> result.attachChild(x.spatial()));

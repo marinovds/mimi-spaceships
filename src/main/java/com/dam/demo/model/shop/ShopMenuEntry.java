@@ -21,11 +21,11 @@ public class ShopMenuEntry implements MenuEntry {
   public static final int WIDTH = AssetUtil.screenWidth() - OFFSET;
   public static final int HEIGHT = 40;
 
-  private final Spatial spatial;
+  private final Node spatial;
   private final List<BitmapText> texts;
   private final ShopItem item;
 
-  private ShopMenuEntry(ShopItem item, List<BitmapText> texts, Spatial spatial) {
+  private ShopMenuEntry(ShopItem item, List<BitmapText> texts, Node spatial) {
     this.item = item;
     this.texts = texts;
     this.spatial = spatial;
@@ -80,8 +80,8 @@ public class ShopMenuEntry implements MenuEntry {
 
   @Override
   public void onCursor(boolean state) {
-    var size = state ? 40 : 30;
-    texts.forEach(x -> x.setSize(size));
+    var scale = state ? 1.3f : 1f;
+    spatial.getChildren().forEach(x -> x.setLocalScale(scale));
   }
 
   @Override

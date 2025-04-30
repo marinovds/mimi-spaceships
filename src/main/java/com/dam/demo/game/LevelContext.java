@@ -22,16 +22,16 @@ import com.jme3.scene.Spatial;
 
 public final class LevelContext implements GameContext {
 
-  private static final int BASE_SCORE = 300;
+  private static final int BASE_SCORE = 3_000;
 
   private final Node guiNode;
   private final Hud hud;
 
   private LevelState state;
+  public int level = 1;
 
   // TODO: refactor
   public Spaceship player;
-  public static int level = 1;
 
   LevelContext(SimpleApplication app) {
     this.guiNode = app.getGuiNode();
@@ -128,8 +128,12 @@ public final class LevelContext implements GameContext {
   }
 
   public void nextLevel() {
-    ++LevelContext.level;
+    ++level;
     state = LevelState.ENEMY_SPAWNING;
+  }
+
+  public int level() {
+    return level;
   }
 
   public boolean inGame() {
@@ -193,6 +197,29 @@ public final class LevelContext implements GameContext {
         .findFirst()
         .orElse("ambient");
     SoundUtil.music(music);
+  }
+
+  public Node saveData() {
+    var spatial = player.spatial().clone();
+    spatial.setName("savedPlayer");
+    spatial.removeControl(SpaceshipControl.class);
+
+    var result = new Node("save");
+    result.attachChild(spatial);
+    result.setUserData("state", state.name());
+    result.setUserData("level", level);
+
+    return result;
+  }
+
+  public void loadGame(Node save) {
+    var spatial = save.getChild("savedPlayer");
+    var player = Spaceship.of(spatial);
+    player.spatial().addControl(new SpaceshipControl(new PlayerBehaviour(player)));
+
+    this.state = LevelState.valueOf(save.getUserData("state"));
+    this.level = save.getUserData("level");
+    this.player = player;
   }
 
   public enum LevelState {

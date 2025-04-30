@@ -19,12 +19,13 @@ public sealed interface Tag {
         .collect(HashSet::new, Set::add, Set::addAll);
   }
 
-  static Object[] tags(Set<Tag> tags, Tag other) {
+  static String[] tags(Set<Tag> tags, Tag other) {
     return Stream.concat(
             tags.stream(),
             Stream.of(other)
         )
-        .toArray(Object[]::new);
+        .map(Object::toString)
+        .toArray(String[]::new);
   }
 
   static Optional<Tag> of(String input) {

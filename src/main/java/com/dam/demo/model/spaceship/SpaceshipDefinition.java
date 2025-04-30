@@ -5,6 +5,7 @@ import static com.dam.demo.model.UserConstants.ATTACK;
 import static com.dam.demo.model.UserConstants.BASE_HEALTH;
 import static com.dam.demo.model.UserConstants.COINS;
 import static com.dam.demo.model.UserConstants.HEALTH;
+import static com.dam.demo.model.UserConstants.MAX_HEALTH;
 import static com.dam.demo.model.UserConstants.POINTS;
 import static com.dam.demo.model.UserConstants.SPEED;
 import static com.dam.demo.model.UserConstants.TAGS;
@@ -25,6 +26,7 @@ public record SpaceshipDefinition(
     int points) {
 
   public void applyTo(Spatial spatial) {
+    spatial.setUserData(MAX_HEALTH, health);
     spatial.setUserData(BASE_HEALTH, health);
     spatial.setUserData(HEALTH, health);
     spatial.setUserData(SPEED, speed);
