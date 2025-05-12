@@ -123,7 +123,9 @@ public final class LevelContext implements GameContext {
   public void playerKilled() {
     state = LevelState.INIT;
     SoundUtil.play("gameOver");
+    SoundUtil.music("lose");
     player.spatial().removeFromParent();
+    Contexts.contextByClass(HighScoreContext.class).save(player.points());
     Contexts.switchContext(HighScoreContext.class);
   }
 

@@ -32,6 +32,13 @@ public final class Menu {
     return this;
   }
 
+  public Menu disable() {
+    spatial.detachAllChildren();
+    spatial.removeFromParent();
+
+    return this;
+  }
+
   public void onTick() {
     var available = availableEntries();
     for (int i = 0; i < available.size(); i++) {
@@ -61,6 +68,10 @@ public final class Menu {
     index = input == Input.UP
         ? moveIndex(-1)
         : moveIndex(1);
+  }
+
+  public <T extends MenuEntry> T getEntry(int index) {
+    return (T) entries.get(index);
   }
 
   private int moveIndex(int delta) {

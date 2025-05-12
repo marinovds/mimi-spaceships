@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class SoundUtil {
 
@@ -36,7 +35,6 @@ public class SoundUtil {
   }
 
   public static void music(String tune) {
-    var log = Logger.getLogger("test");
     var audio = AUDIO.get(tune);
     if (audio.getStatus() == Status.Playing) {
       // music already playing. Don't do anything

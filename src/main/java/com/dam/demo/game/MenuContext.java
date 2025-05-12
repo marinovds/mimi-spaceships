@@ -1,23 +1,17 @@
 package com.dam.demo.game;
 
-import static com.dam.demo.util.AssetUtil.manager;
-
 import com.dam.demo.listeners.KeyboardListener.Input;
 import com.dam.demo.model.menu.Menu;
 import com.dam.demo.model.menu.MenuAction;
 import com.dam.demo.model.menu.MenuConfig;
 import com.dam.demo.model.menu.MenuEntry;
 import com.dam.demo.model.menu.MenuUtil;
+import com.dam.demo.util.SaveUtil;
 import com.jme3.app.SimpleApplication;
-import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Node;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class MenuContext implements GameContext {
 
@@ -42,8 +36,10 @@ public final class MenuContext implements GameContext {
               Contexts.contextByClass(LevelContext.class).reset();
               Contexts.switchContext(LevelContext.class);
             }),
-        createOption("High Score", () -> false, () -> {
-        }),
+        createOption(
+            "High Score",
+            HighScoreContext::available,
+            () -> Contexts.switchContext(HighScoreContext.class)),
         MenuUtil.selectableText(
             "Exit",
             () -> {
@@ -71,7 +67,7 @@ public final class MenuContext implements GameContext {
 
   @Override
   public void disable() {
-    menu.spatial().removeFromParent();
+    menu.disable();
   }
 
   @Override
@@ -89,36 +85,20 @@ public final class MenuContext implements GameContext {
         40);
   }
 
-  private static Path savefilePath() {
-    return Path.of(
-        System.getProperty("user.home"),
-        "Documents",
-        "My Games",
-        "MiMi Spaceships",
-        "save.j3o");
-  }
 
   private static void save() {
-    var exporter = BinaryExporter.getInstance();
-    try {
-      var levelContext = Contexts.contextByClass(LevelContext.class);
-      var saveNode = levelContext.saveData();
-      exporter.save(saveNode, savefilePath().toFile());
-    } catch (IOException ex) {
-      Logger.getLogger("save").log(Level.SEVERE, "Error: Failed to save game!", ex);
-    }
+    SaveUtil.save("save", Contexts.contextByClass(LevelContext.class).saveData());
   }
 
   private static void load() {
-    var saveFile = savefilePath();
-    if (!Files.exists(saveFile)) {
+    if (!SaveUtil.exits("save")) {
       return;
     }
 
-    var savedGame = (Node) manager.loadModel("/Documents/My Games/MiMi Spaceships/save.j3o");
+    var savedGame = SaveUtil.load("save");
     try {
       Contexts.contextByClass(LevelContext.class).loadGame(savedGame);
-      Files.delete(saveFile);
+      SaveUtil.delete("save");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

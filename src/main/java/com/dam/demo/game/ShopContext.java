@@ -76,7 +76,7 @@ public final class ShopContext implements GameContext {
 
   @Override
   public void disable() {
-    menu.spatial().removeFromParent();
+    menu.disable();
   }
 
   @Override
