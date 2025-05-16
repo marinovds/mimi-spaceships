@@ -49,6 +49,14 @@ public enum RandomUtil {
     return pick.function().get();
   }
 
+  public static float inBounds(float lower, float upper) {
+    if (lower >= upper) {
+      throw new IllegalArgumentException("Lower bound is higher than upper");
+    }
+
+    return lower + RANDOM.nextFloat(upper - lower);
+  }
+
   public interface Weighted {
 
     int getWeight();

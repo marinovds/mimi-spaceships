@@ -1,6 +1,7 @@
 package com.dam.demo.model.behaviour.spaceship;
 
 import static com.dam.util.RandomUtil.RANDOM;
+import static com.dam.util.RandomUtil.inBounds;
 import static java.lang.Math.signum;
 
 import com.dam.demo.enemies.Tag.ShipType;
@@ -30,8 +31,8 @@ public class BomberBehaviour implements SpaceshipBehaviour {
         Duration.ofSeconds(1)
     );
 
-    widthDirection = randomDirection();
-    heightDirection = randomDirection();
+    widthDirection = inBounds(0.4f, 1f);
+    heightDirection = inBounds(0.4f, 1f);
     rotation = 4f + RANDOM.nextFloat();
   }
 
@@ -50,19 +51,19 @@ public class BomberBehaviour implements SpaceshipBehaviour {
     var rand = 4f + RANDOM.nextFloat();
     if (boundary.top()) {
       rotation = rand;
-      heightDirection = -randomDirection();
+      heightDirection = -inBounds(0.4f, 1f);
     }
     if (boundary.bottom()) {
       rotation = rand;
-      heightDirection = randomDirection();
+      heightDirection = inBounds(0.4f, 1f);
     }
     if (boundary.left()) {
       rotation = rand;
-      widthDirection = randomDirection();
+      widthDirection = inBounds(0.4f, 1f);
     }
     if (boundary.right()) {
       rotation = rand;
-      widthDirection = -randomDirection();
+      widthDirection = -inBounds(0.4f, 1f);
     }
   }
 
@@ -70,8 +71,8 @@ public class BomberBehaviour implements SpaceshipBehaviour {
   public void onCollision(Spatial spatial, float tpf) {
     if (ShipType.PLAYER.is(spatial)
         && collision.tryAttack(spatial, spaceship.improvements())) {
-        revertDirection();
-        return;
+      revertDirection();
+      return;
     }
 
     if (collision.friendlyCollided()) {
@@ -80,8 +81,8 @@ public class BomberBehaviour implements SpaceshipBehaviour {
   }
 
   private void revertDirection() {
-    widthDirection = -signum(widthDirection) * randomDirection();
-    heightDirection = -signum(heightDirection) * randomDirection();
+    widthDirection = -signum(widthDirection) * inBounds(0.4f, 1f);
+    heightDirection = -signum(heightDirection) * inBounds(0.4f, 1f);
     rotation = 4f + RANDOM.nextFloat();
   }
 
@@ -93,10 +94,6 @@ public class BomberBehaviour implements SpaceshipBehaviour {
   @Override
   public Spaceship spaceship() {
     return spaceship;
-  }
-
-  private static float randomDirection() {
-    return 0.4f + RANDOM.nextFloat(0.6f);
   }
 
   public record BomberAttack(int collision) implements SpaceshipAttack {

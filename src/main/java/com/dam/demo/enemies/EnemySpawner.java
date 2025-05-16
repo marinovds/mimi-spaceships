@@ -9,6 +9,8 @@ import com.dam.demo.model.Dimensions;
 import com.dam.demo.model.Ticker;
 import com.dam.demo.model.behaviour.spaceship.BomberBehaviour;
 import com.dam.demo.model.behaviour.spaceship.Boss1Behaviour;
+import com.dam.demo.model.behaviour.spaceship.Boss2Behaviour;
+import com.dam.demo.model.behaviour.spaceship.Boss3Behaviour;
 import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour;
 import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour;
 import com.dam.demo.model.spaceship.Spaceship;
@@ -37,15 +39,15 @@ public enum EnemySpawner {
   );
 
   public static final EnemyDef BOSS_2 = new EnemyDef(
-      SpaceshipDefinitions.BOSS_1_DEF,
+      SpaceshipDefinitions.BOSS_2_DEF,
       SpawnCriteria.none(2),
-      Boss1Behaviour::new
+      Boss2Behaviour::new
   );
 
   public static final EnemyDef BOSS_3 = new EnemyDef(
-      SpaceshipDefinitions.BOSS_1_DEF,
+      SpaceshipDefinitions.BOSS_3_DEF,
       SpawnCriteria.none(3),
-      Boss1Behaviour::new
+      Boss3Behaviour::new
   );
 
   public static final EnemyDef CRUISER_DEF = new EnemyDef(

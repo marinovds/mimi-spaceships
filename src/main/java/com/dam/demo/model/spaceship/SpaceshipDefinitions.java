@@ -15,6 +15,8 @@ import com.dam.demo.enemies.Tag.SpatialType;
 import com.dam.demo.model.attack.Shot;
 import com.dam.demo.model.behaviour.spaceship.BomberBehaviour.BomberAttack;
 import com.dam.demo.model.behaviour.spaceship.Boss1Behaviour.Boss1Attack;
+import com.dam.demo.model.behaviour.spaceship.Boss2Behaviour.Boss2Attack;
+import com.dam.demo.model.behaviour.spaceship.Boss3Behaviour.Boss3Attack;
 import com.dam.demo.model.behaviour.spaceship.ChaserBehaviour.ChaserAttack;
 import com.dam.demo.model.behaviour.spaceship.CruiserBehaviour.CruiserAttack;
 import com.dam.demo.model.behaviour.spaceship.PlayerBehaviour.PlayerAttack;
@@ -36,6 +38,40 @@ public enum SpaceshipDefinitions {
       ),
       300,
       350,
+      500,
+      0
+  );
+
+  public static final SpaceshipDefinition BOSS_2_DEF = new SpaceshipDefinition(
+      "boss2",
+      Set.of(SpatialType.SPACESHIP, ShipType.BOSS, ShipType.ENEMY, LIGHT),
+      new Boss2Attack(
+          new Shot(bullet(5), 1000, Duration.ofMillis(500)),
+          new Shot(bullet(5), 1000, Duration.ofMillis(500)),
+          new Shot(bullet(5), 1000, Duration.ofMillis(500)),
+          10,
+          Duration.ofSeconds(3),
+          Duration.ofMillis(100)
+      ),
+      400,
+      200,
+      500,
+      0
+  );
+
+  public static final SpaceshipDefinition BOSS_3_DEF = new SpaceshipDefinition(
+      "boss3",
+      Set.of(SpatialType.SPACESHIP, ShipType.BOSS, ShipType.ENEMY, LIGHT),
+      new Boss3Attack(
+          new Shot(rocket(20), 800, Duration.ofMillis(500)),
+          new Shot(bullet(15), 1000, Duration.ofMillis(500)),
+          30,
+          Duration.ofSeconds(3),
+          Duration.ofMillis(100),
+          Duration.ofSeconds(5)
+      ),
+      350,
+      400,
       500,
       0
   );

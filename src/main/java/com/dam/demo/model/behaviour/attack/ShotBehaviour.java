@@ -32,12 +32,16 @@ public class ShotBehaviour implements AttackBehaviour {
   private final Shot shot;
   private final Ticker ticker;
 
-  public ShotBehaviour(ShipType shooter, Supplier<Vector3f> location, Shot shot) {
+  public ShotBehaviour(ShipType shooter, Vector3f aim, Supplier<Vector3f> location, Shot shot) {
     this.shooter = shooter;
     this.location = location;
     this.shot = shot;
-    this.aim = getAim(shooter);
+    this.aim = aim;
     this.ticker = Ticker.of(Duration.ZERO);
+  }
+
+  public ShotBehaviour(ShipType shooter, Supplier<Vector3f> location, Shot shot) {
+    this(shooter, getAim(shooter), location, shot);
   }
 
   @Override
